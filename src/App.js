@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import "./App.css";
 import "./responsive.css";
 import "react-toastify/dist/ReactToastify.css";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomeScreen from "./screens/HomeScreen";
 import QnAScreen from "./screens/QnAScreen";
 import AddQnA from "./screens/AddQnA";
@@ -18,17 +18,17 @@ function App() {
   return (
     <>
       <Router>
-        <Switch>
-          <PrivateRouter path="/" component={HomeScreen} exact />
-          <PrivateRouter path="/qnas" component={QnAScreen} />
-          <PrivateRouter path="/add-qna" component={AddQnA} />
-          <PrivateRouter path="/add-user" component={AddUser} />
-
-          <PrivateRouter path="/users" component={UsersScreen} />
-          <PrivateRouter path="/qna/:id/edit" component={QnAEditScreen} />
-          <Route path="/login" component={Login} />
-          <Route path="*" component={NotFound} />
-        </Switch>
+        <Routes>
+          <Route path="/" exact element={<HomeScreen />} />
+          <Route path="/qnas" element={<QnAScreen />} />
+          <Route path="/add-qna" element={<AddQnA />} />
+          <Route path="/add-user" element={<AddUser />} />
+          
+          <Route path="/users" element={<UsersScreen />} />
+          <Route path="/qna/:id/edit" element={<QnAEditScreen />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </Router>
     </>
   );

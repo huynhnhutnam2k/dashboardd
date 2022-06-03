@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import $ from "jquery";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutRequest } from "../redux/apiRequest";
 const Header = () => {
   useEffect(() => {
     $("[data-trigger]").on("click", function (e) {
@@ -20,7 +22,19 @@ const Header = () => {
       }
     });
   }, []);
-
+  const user = useSelector(state => state.auth.login?.user)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  useEffect(()=> {  
+    if(!user){
+      navigate('/login')
+    }
+  },[])
+  const handleLogout = () => {
+    if(user.token){
+      logoutRequest(dispatch,user.token, user._id, navigate)
+    }
+  }
   return (
     <header className="main-header navbar">
       <div className="col-search">
@@ -71,7 +85,7 @@ const Header = () => {
               />
             </Link>
             <div className="dropdown-menu dropdown-menu-end">
-              <Link className="dropdown-item text-danger" to="#">
+              <Link className="dropdown-item text-danger" to="#" onClick={handleLogout}>
                 Đăng xuất
               </Link>
             </div>

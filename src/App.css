@@ -50,7 +50,9 @@ a.disabled {
   width: 100%;
   visibility: visible;
 } */
-
+.button-parent ion-icon{
+  pointer-events: none;
+}
 /* =================  DEFINED VARIABLES =================== */
 .icon-xs,
 .icon-sm,
@@ -161,6 +163,7 @@ body.offcanvas-active {
 }
 
 .content-main {
+  
   padding: 30px 3%;
   margin-left: auto;
   margin-right: auto;
@@ -905,4 +908,17 @@ ul.row-sm {
   font-size: 1.2rem;
   line-height: 0.7;
   vertical-align: bottom;
+}
+
+
+.modal{
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.075);
+  z-index: 101;
 }
