@@ -15,11 +15,12 @@ const ToastObjects = {
   pauseOnHouver: false,
   autoClose: 2000,
 };
-const AddQnAMain = ({ history }) => {
+const AddQnAMain = () => {
   const user = useSelector(state => state.auth.login?.user) 
   const categories = useSelector(state => state.question.getCd?.data?.categories)
   const department = useSelector(state => state.question.getCd?.data?.department)
   const pending = useSelector(state => state.question.addQuestion?.pending)
+  console.log(pending)
   const navigate = useNavigate()
   const dispatch = useDispatch()
   useEffect(() => {
@@ -27,7 +28,7 @@ const AddQnAMain = ({ history }) => {
   },[])
   const [file, setFile] = useState('')
   // const [reviewSource, setPreviewSource] = useState('')
-  console.log( categories)
+  // console.log( categories)
   const handleFileInputChange = (e) => {
     const file = e.target.files[0];
     previewFile(file);

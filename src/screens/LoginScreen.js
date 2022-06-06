@@ -5,15 +5,16 @@ import Toast from "./../components/LoadingError/Toast";
 import {useFormik} from 'formik'
 import * as yup from 'yup'
 import { loginRequest } from "../redux/apiRequest";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-const Login = ({ location, history }) => {
+const Login = () => {
   window.scrollTo(0, 0);
-  // const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");
   const dispatch = useDispatch()
-  // const history = history
   const navigate = useNavigate()
+  const pending = useSelector(state => state.auth.login?.pending)
+  const error = useSelector(state => state.auth.login?.error)
+  const msg = useSelector(state => state.auth.login?.msg)
+  console.log(msg)
   const formik = useFormik({
     initialValues:{
       email: "",
@@ -24,7 +25,7 @@ const Login = ({ location, history }) => {
       password: yup.string().required("required")
     }),
     onSubmit: (values)=> {
-      // console.log(values)
+      console.log(values)
       const user = {
         email: values.email,
         password: values.password
@@ -36,15 +37,14 @@ const Login = ({ location, history }) => {
 
   return (
     <>
-      <Toast />
+      
       <div
         className="card shadow mx-auto"
         style={{ maxWidth: "380px", marginTop: "100px" }}
       >
         <div className="card-body">
           <h4 className="card-title mb-4 text-center">Đăng nhập</h4>
-          {/* {loading && <Loading />} */}
-          {/* {error && <Message variant="alert-danger">{error}</Message>} */}
+          {pending ? <Loading /> : error && <Message variant="alert-danger">{msg}</Message>}
           <form onSubmit={formik.handleSubmit}>
             <div className="mb-3">
               <input

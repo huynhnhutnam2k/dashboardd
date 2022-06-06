@@ -12,7 +12,7 @@ const UserComponent = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   useEffect(() => {
-    getAllUser(dispatch, user.token)
+    getAllUser(dispatch, user?.token)
   },[])
   // console.log(users, error)
 

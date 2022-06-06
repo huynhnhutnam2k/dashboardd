@@ -44,7 +44,7 @@ const Sidebar = () => {
                 <span className="text">Danh sách câu hỏi</span>
               </NavLink>
             </li>
-            <li className="menu-item">
+            {/* <li className="menu-item">
               <NavLink
                 activeClassName="active"
                 className="menu-link"
@@ -53,7 +53,7 @@ const Sidebar = () => {
                 <i class="icon fas fa-plus "></i>
                 <span className="text">Thêm câu hỏi</span>
               </NavLink>
-            </li>
+            </li> */}
 
             <li className="menu-item">
               <NavLink
@@ -69,12 +69,32 @@ const Sidebar = () => {
               <NavLink
                 activeClassName="active"
                 className="menu-link"
+                to="/department"
+              >
+                <i className="icon fas fa-user"></i>
+                <span className="text">Chuyên khoa</span>
+              </NavLink>
+            </li>
+            <li className="menu-item">
+              <NavLink
+                activeClassName="active"
+                className="menu-link"
+                to="/diagnose"
+              >
+                <i className="icon fas fa-user"></i>
+                <span className="text">Chuẩn đoán</span>
+              </NavLink>
+            </li>
+            {/* <li className="menu-item">
+              <NavLink
+                activeClassName="active"
+                className="menu-link"
                 to="/add-user"
               >
                 <i class="icon fas fa-plus "></i>
                 <span className="text">Thêm nhân viên</span>
               </NavLink>
-            </li>
+            </li> */}
           </ul>
           <br />
           <br />

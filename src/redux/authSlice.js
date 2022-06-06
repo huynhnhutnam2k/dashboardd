@@ -6,8 +6,8 @@ export const authSlice = createSlice({
     initialState:{
         login:{
             user: null,
-            pending: false,
-            error: false,
+            pending: null,
+            error: null,
             msg: ""
         },
         register: {
@@ -37,8 +37,9 @@ export const authSlice = createSlice({
             state.login.error = false
         },
         loginFail : (state, action)=> {
+            state.login.pending = false
             state.login.error = true
-            // state.login.msg = action.payload
+            state.login.msg = action.payload
         },
         getAllUserStart : state=> {
             state.getAllUser.pending = true

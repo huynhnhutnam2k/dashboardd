@@ -11,6 +11,7 @@ import AddUser from "./screens/AddUser";
 import Login from "./screens/LoginScreen";
 import UsersScreen from "./screens/UsersScreen";
 import QnAEditScreen from "./screens/QnAEditScreen";
+import DepartmentScreen from "./screens/DepartmentScreen";
 import NotFound from "./screens/NotFound";
 import PrivateRouter from "./PrivateRouter";
 
@@ -23,7 +24,7 @@ function App() {
           <Route path="/qnas" element={<QnAScreen />} />
           <Route path="/add-qna" element={<AddQnA />} />
           <Route path="/add-user" element={<AddUser />} />
-          
+          <Route path="/department" element={<DepartmentScreen />} />
           <Route path="/users" element={<UsersScreen />} />
           <Route path="/qna/:id/edit" element={<QnAEditScreen />} />
           <Route path="/login" element={<Login />} />

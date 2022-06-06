@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {useDispatch, useSelector} from 'react-redux'
-import { allQuestion, deleteQuestionRequest, getAQuestionRequest } from "../../redux/apiRequest";
+import { allQuestion, deleteQuestionRequest } from "../../redux/apiRequest";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -16,6 +16,7 @@ import Modal from '@mui/material/Modal';
 import Stack from '@mui/material/Stack';
 import momment from 'moment'
 import Loading from "../LoadingError/Loading";
+import { allDepartment, departFetch } from "../../redux/departmentSlice";
 const style = {
   position: 'absolute',
   top: '50%',
@@ -27,13 +28,15 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-const MainQnAs = () => {
-  const dispatch = useDispatch()
+
+const MainDepartment = () => {
+    const dispatch = useDispatch()
   // const user = useSelector(state => state.auth.login?.user)
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const question = useSelector(state => state.question.allQuestion?.data)
+//   const question = useSelector(state => state.question.allQuestion?.data)
+    const department = useSelector(allDepartment)
   const user = useSelector(state => state.auth.login?.user)
   const success = useSelector(state => state.question.deleteQuestion?.access)
   // console.log(success)
@@ -42,11 +45,13 @@ const MainQnAs = () => {
   const pending = useSelector(state => state.question.allQuestion?.pending)
   // console.log(pending)
   useEffect(() => {
-    allQuestion(dispatch)
+    // allQuestion(dispatch)
+    dispatch(departFetch())
   },[])
   // console.log( question)
   const handleChange = (e) => {
-   
+    // console.log(e.target.dataset.id)
+    // console.log(row)
     navigate(`/qna/${e.target.dataset.id}/edit`)
   }
   const handleConfirm = async() => {
@@ -59,12 +64,11 @@ const MainQnAs = () => {
     setOpen(true)
     setIdQuestion(e.target.dataset.id)
   }
-  // console.log(open)
   return (
     <>
       <section className="content-main">
         <div className="content-header">
-          <h2 className="content-title">Danh sách câu hỏi</h2>
+          <h2 className="content-title">Danh sách chuyên khoa</h2>
           <div>
             <Link to="/add-qna" className="btn btn-primary">
               Thêm mới
@@ -108,16 +112,16 @@ const MainQnAs = () => {
                 <TableHead>
                   <TableRow>
                     <TableCell>Name</TableCell>
-                    <TableCell align="center">Image</TableCell>
-                    <TableCell align="center">Department</TableCell>
+                    {/* <TableCell align="center">Image</TableCell> */}
+                    <TableCell align="center">Số lượng câu hỏi</TableCell>
                     {/* <TableCell align="center">Categories</TableCell> */}
-                    <TableCell align="center">Average Mark</TableCell>
+                    <TableCell align="center">Dean name</TableCell>
                     <TableCell align="center">Created At</TableCell>
                     <TableCell align="center"></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {question?.map((row) => (
+                  {department?.map((row) => (
                     <TableRow
                       key={row._id}
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -125,10 +129,10 @@ const MainQnAs = () => {
                       <TableCell component="th" scope="row" align="center">
                         {row.name}
                       </TableCell>
-                      <TableCell align="center"> <img src={row.image} style={{maxWidth: "100px"}}/></TableCell>
-                      <TableCell align="center">{row.department.name}</TableCell>
+                      {/* <TableCell align="center"> <img src={row.image} style={{maxWidth: "100px"}}/></TableCell> */}
+                      <TableCell align="center">{row.question.length}</TableCell>
                       {/* <TableCell align="center">{row.categories?.name}</TableCell> */}
-                      <TableCell align="center">{row.averageMark}</TableCell>
+                      <TableCell align="center">{row.deanName}</TableCell>
                       <TableCell align="center"> {momment(row.createdAt).format("MMM Do YY")}</TableCell>
                       <TableCell align="center" sx={{ alignItems: 'center', display: "flex",  height: "200px", cursor: "pointer", gap: "0 15px"}}>
                         <div onClick={handleChange} data-id={row._id} className="button-parent"><ion-icon name="hammer-outline"></ion-icon></div>
@@ -162,9 +166,7 @@ const MainQnAs = () => {
       </section>
     </>
     
-  );
-};
+  )
+}
 
-
-
-export default MainQnAs;
+export default MainDepartment

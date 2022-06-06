@@ -1,12 +1,11 @@
 import { getAllUserAccess, getAllUserFail, getAllUserStart, loginFail, loginStart, loginSuccess, logoutAccess, logoutFail, logoutStart, registerAccess, registerFail, registerStart } from "./authSlice"
-// import { url } from './url' 
+// import  url  from './url' 
 import axios from 'axios'
-import { addQuestionAccess, addQuestionFail, addQuestionStart, deleteQuestionAccess, deleteQuestionFail, deleteQuestionStart, getAllFail, getAllStart, getAllSuccess, getAQuesionAccess, getAQuesionStart, getAQuestionFail, getCdAccess, getCdFail, getCdStart, updateQuestionFail, updateQuestionStart, updateQuestionSuccess } from "./questionSlice"
+import { addQuestionAccess, addQuestionFail, addQuestionStart, deleteQuestionAccess, deleteQuestionFail, deleteQuestionStart, getAllFail, getAllStart, getAllSuccess, getAQuesionAccess, getAQuesionStart, getAQuestionFail, getCdAccess, getCdFail, getCdStart, getQuestionByCateAccess, getQuestionByCateFail, getQuestionByCateStart, getQuestionByDepartmentAccess, getQuestionByDepartmentFail, getQuestionByDepartmentStart, updateQuestionFail, updateQuestionStart, updateQuestionSuccess } from "./questionSlice"
 import { getDepartmentByCateAccess, getDepartmentByCateFail, getDepartmentByCateStart } from "./departmentSlice"
 const url = 'https://serverdhyd.herokuapp.com/api/v1'
 // const url = 'http://localhost:2000/api/v1'
 export const loginRequest = async(dispatch, navigate, user) => {
-    // console.log(url)
     dispatch(loginStart())
     try {
         const res = await axios.post(`${url}/auth/login`, user)
@@ -14,7 +13,7 @@ export const loginRequest = async(dispatch, navigate, user) => {
         // history.push('/')
         navigate('/')
     } catch (error) {
-        dispatch(loginFail())
+        dispatch(loginFail(error.response.data))
     }
 }
 export const logoutRequest = async(dispatch, token, userId, navigate) => {
@@ -106,18 +105,20 @@ export const getDepartmentByCateRequest = async(dispatch, categoriesId) => {
         dispatch(getDepartmentByCateFail())
     }
 }
-export const getAQuestionRequest = async(dispatch, id) => {
+export const getAQuestionRequest = (id) => async(dispatch) => {
     dispatch(getAQuesionStart())
     try{
-        const res = await axios.get(`${url}/question/${id}`)
-        dispatch(getAQuesionAccess(res.data))
+        const {data} = await axios.get(`${url}/question/${id}`)
+
+         dispatch(getAQuesionAccess(data))
+         
     }catch(error){
         dispatch(getAQuestionFail())
     }
 }
 
 export const updateQuestionRequest = async(dispatch, token, questionUpdate, questionId, navigate) => {
-    dispatch(updateQuestionStart())
+    await dispatch(updateQuestionStart())
     try {
         await axios.put(`${url}/question/update/${questionId}`, questionUpdate, {
             headers: {
@@ -144,3 +145,24 @@ export const deleteQuestionRequest = async(dispatch, questionId, token) => {
         dispatch(deleteQuestionFail())
     }
 }
+
+export const getQuestionByCateRequest = async(dispatch,categoriesId) => {
+    dispatch(getQuestionByCateStart())
+    try {
+        const res = await axios.get(`${url}/question/cate/${categoriesId}`)
+        dispatch(getQuestionByCateAccess(res.data))
+    } catch (error) {
+        dispatch(getQuestionByCateFail())
+    }
+}
+export const getQuestionByDepartmentRequest = async(dispatch,departmentId) => {
+    dispatch(getQuestionByDepartmentStart())
+    try {
+        const res = await axios.get(`${url}/question/department/${departmentId}`)
+        dispatch(getQuestionByDepartmentAccess(res.data))
+    } catch (error) {
+        dispatch(getQuestionByDepartmentFail())
+    }
+}
+
+
