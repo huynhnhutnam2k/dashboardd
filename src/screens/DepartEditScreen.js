@@ -1,8 +1,9 @@
 import Sidebar from "../components/sidebar";
 import Header from "../components/Header";
 import EditQnAMain from "../components/qnas/EditQnAMain";
+import EditDepartMain from "../components/deparment/EditDepartMain";
 
-const QnAEditScreen = () => {
+const DepartEditScreen = () => {
   // const productId = match.params.id;
 
   return (
@@ -10,9 +11,9 @@ const QnAEditScreen = () => {
       <Sidebar />
       <main className="main-wrap">
         <Header />
-        <EditQnAMain  />
+        <EditDepartMain  />
       </main>
     </>
   );
 };
-export default QnAEditScreen;
+export default DepartEditScreen;

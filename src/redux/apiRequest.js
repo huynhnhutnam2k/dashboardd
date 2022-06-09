@@ -5,96 +5,63 @@ import { addQuestionAccess, addQuestionFail, addQuestionStart, deleteQuestionAcc
 import { getDepartmentByCateAccess, getDepartmentByCateFail, getDepartmentByCateStart } from "./departmentSlice"
 const url = 'https://serverdhyd.herokuapp.com/api/v1'
 // const url = 'http://localhost:2000/api/v1'
-export const loginRequest = async(dispatch, navigate, user) => {
-    dispatch(loginStart())
-    try {
-        const res = await axios.post(`${url}/auth/login`, user)
-        dispatch(loginSuccess(res.data))
-        // history.push('/')
-        navigate('/')
-    } catch (error) {
-        dispatch(loginFail(error.response.data))
-    }
-}
-export const logoutRequest = async(dispatch, token, userId, navigate) => {
-    dispatch(logoutStart())
-    try {
-        await axios.post(`${url}/auth/logout`, userId, {
-            headers: {
-                token: `Bearer ${token}`
-            }
-        })
-        dispatch(logoutAccess())
-        navigate("/login")
-    } catch (error) {
-        dispatch(logoutFail())
-    }
-}
-export const allQuestion = async(dispatch) => {
-    dispatch(getAllStart()) 
-    try{
-        const res = await axios.get(`${url}/question`)
-        dispatch(getAllSuccess(res.data))
-    }catch(err){
-        dispatch(getAllFail())
-    }
-}
+// export const loginRequest = async(dispatch, navigate, user) => {
+//     dispatch(loginStart())
+//     try {
+//         const res = await axios.post(`${url}/auth/login`, user)
+//         dispatch(loginSuccess(res.data))
+//         // history.push('/')
+//         navigate('/')
+//     } catch (error) {
+//         dispatch(loginFail(error.response.data))
+//     }
+// }
+// export const logoutRequest = async(dispatch, token, userId, navigate) => {
+//     dispatch(logoutStart())
+//     try {
+//         await axios.post(`${url}/auth/logout`, userId, {
+//             headers: {
+//                 token: `Bearer ${token}`
+//             }
+//         })
+//         dispatch(logoutAccess())
+//         navigate("/login")
+//     } catch (error) {
+//         dispatch(logoutFail())
+//     }
+// }
 
-export const getCd = async(dispatch, token) => {
-    dispatch(getCdStart())
-    try {
-        const res = await axios.get(`${url}/question/getCd`, {
-            headers: {
-                token: `Bearer ${token}`
-            }
-        })
-        dispatch(getCdAccess(res.data))
-    } catch (error) {
-        dispatch(getCdFail())
-    }
-}
 
-export const addQuestionRequest = async(dispatch, token, question) => {
-    dispatch(addQuestionStart())
-    try {
-        const res = await axios.post(`${url}/question/add`, question, {
-            headers: {
-                token: `Bearer ${token}`
-            }
-        })
-        dispatch(addQuestionAccess(res.data))
-    } catch (error) {
-        dispatch(addQuestionFail())
-    }
-}
 
-export const getAllUser = async(dispatch, token) => {
-    dispatch(getAllUserStart())
-    try {
-        const res = await axios.get(`${url}/auth` , {
-            headers: {
-                token: `Bearer ${token}`
-            }
-        })
-        dispatch(getAllUserAccess(res.data))
-    } catch (error) {
-        dispatch(getAllUserFail())
-    }
-}
 
-export const registerRequest = async(dispatch, token, user) => {
-    dispatch(registerStart())
-    try {
-        await axios.post(`${url}/auth/register`, user , {
-            headers: {
-                token: `Bearer ${token}`
-            }
-        })
-        dispatch(registerAccess())
-    } catch (error) {
-        dispatch(registerFail(error.response.data))
-    }
-}
+
+// export const getAllUser = async(dispatch, token) => {
+//     dispatch(getAllUserStart())
+//     try {
+//         const res = await axios.get(`${url}/auth` , {
+//             headers: {
+//                 token: `Bearer ${token}`
+//             }
+//         })
+//         dispatch(getAllUserAccess(res.data))
+//     } catch (error) {
+//         dispatch(getAllUserFail())
+//     }
+// }
+
+// export const registerRequest = async(dispatch, token, user) => {
+//     dispatch(registerStart())
+//     try {
+//         await axios.post(`${url}/auth/register`, user , {
+//             headers: {
+//                 token: `Bearer ${token}`
+//             }
+//         })
+//         dispatch(registerAccess())
+//     } catch (error) {
+//         dispatch(registerFail(error.response.data))
+//     }
+// }
 
 export const getDepartmentByCateRequest = async(dispatch, categoriesId) => {
     dispatch(getDepartmentByCateStart())
@@ -105,64 +72,6 @@ export const getDepartmentByCateRequest = async(dispatch, categoriesId) => {
         dispatch(getDepartmentByCateFail())
     }
 }
-export const getAQuestionRequest = (id) => async(dispatch) => {
-    dispatch(getAQuesionStart())
-    try{
-        const {data} = await axios.get(`${url}/question/${id}`)
 
-         dispatch(getAQuesionAccess(data))
-         
-    }catch(error){
-        dispatch(getAQuestionFail())
-    }
-}
-
-export const updateQuestionRequest = async(dispatch, token, questionUpdate, questionId, navigate) => {
-    await dispatch(updateQuestionStart())
-    try {
-        await axios.put(`${url}/question/update/${questionId}`, questionUpdate, {
-            headers: {
-                token: `Bearer ${token}`
-            }
-        })
-        dispatch(updateQuestionSuccess())
-        navigate('/qnas')
-    } catch (error) {
-        dispatch(updateQuestionFail())
-    }
-}
-
-export const deleteQuestionRequest = async(dispatch, questionId, token) => {
-    dispatch(deleteQuestionStart())
-    try {
-        await axios.delete(`${url}/question/delete/${questionId}`, {
-            headers: {
-                token: `Bearer ${token}`
-            }
-        })
-        dispatch(deleteQuestionAccess())
-    } catch (error) {
-        dispatch(deleteQuestionFail())
-    }
-}
-
-export const getQuestionByCateRequest = async(dispatch,categoriesId) => {
-    dispatch(getQuestionByCateStart())
-    try {
-        const res = await axios.get(`${url}/question/cate/${categoriesId}`)
-        dispatch(getQuestionByCateAccess(res.data))
-    } catch (error) {
-        dispatch(getQuestionByCateFail())
-    }
-}
-export const getQuestionByDepartmentRequest = async(dispatch,departmentId) => {
-    dispatch(getQuestionByDepartmentStart())
-    try {
-        const res = await axios.get(`${url}/question/department/${departmentId}`)
-        dispatch(getQuestionByDepartmentAccess(res.data))
-    } catch (error) {
-        dispatch(getQuestionByDepartmentFail())
-    }
-}
 
 

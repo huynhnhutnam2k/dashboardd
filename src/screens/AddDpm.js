@@ -1,18 +1,18 @@
+import React from "react";
 import Sidebar from "../components/sidebar";
 import Header from "../components/Header";
-import EditQnAMain from "../components/qnas/EditQnAMain";
+import AddDepartmentMain from "../components/deparment/AddDepartmentMain";
 
-const QnAEditScreen = () => {
-  // const productId = match.params.id;
-
+const AddDpm = () => {
   return (
     <>
       <Sidebar />
       <main className="main-wrap">
         <Header />
-        <EditQnAMain  />
+        <AddDepartmentMain />
       </main>
     </>
-  );
-};
-export default QnAEditScreen;
+  )
+}
+
+export default AddDpm

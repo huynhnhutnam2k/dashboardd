@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {useDispatch, useSelector} from 'react-redux'
 import { allQuestion, deleteQuestionRequest, getAQuestionRequest } from "../../redux/apiRequest";
@@ -16,6 +16,7 @@ import Modal from '@mui/material/Modal';
 import Stack from '@mui/material/Stack';
 import momment from 'moment'
 import Loading from "../LoadingError/Loading";
+import { deleteQuestion, getAllQuestion } from "../../redux/questionSlice";
 const style = {
   position: 'absolute',
   top: '50%',
@@ -29,37 +30,32 @@ const style = {
 };
 const MainQnAs = () => {
   const dispatch = useDispatch()
-  // const user = useSelector(state => state.auth.login?.user)
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const question = useSelector(state => state.question.allQuestion?.data)
-  const user = useSelector(state => state.auth.login?.user)
-  const success = useSelector(state => state.question.deleteQuestion?.access)
-  // console.log(success)
+  const {listQuestion, pending, error} = useSelector(state => state.question)
+  const {userInfo} = useSelector(state => state.auth)
   const navigate = useNavigate()
   const [idQuestion, setIdQuestion] = useState('')
-  const pending = useSelector(state => state.question.allQuestion?.pending)
-  // console.log(pending)
-  useEffect(() => {
-    allQuestion(dispatch)
-  },[])
+  // const [reload, setReload] = useState(false)
+  useLayoutEffect(() => {
+    dispatch(getAllQuestion())
+  },[dispatch,listQuestion.length])
   // console.log( question)
   const handleChange = (e) => {
    
     navigate(`/qna/${e.target.dataset.id}/edit`)
   }
-  const handleConfirm = async() => {
-    // console.log(idQuestion)
+  const handleConfirm = () => {
     setOpen(false)
-    await deleteQuestionRequest(dispatch,idQuestion, user?.token)
-    navigate("/qna")
+    const id = idQuestion
+    const token = userInfo?.token
+    dispatch(deleteQuestion({id,token}))
   }
   const handleDelete = (e) => {
     setOpen(true)
     setIdQuestion(e.target.dataset.id)
   }
-  // console.log(open)
   return (
     <>
       <section className="content-main">
@@ -117,7 +113,7 @@ const MainQnAs = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {question?.map((row) => (
+                  {listQuestion?.map((row) => (
                     <TableRow
                       key={row._id}
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}

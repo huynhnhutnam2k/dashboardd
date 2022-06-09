@@ -17,6 +17,7 @@ import Stack from '@mui/material/Stack';
 import momment from 'moment'
 import Loading from "../LoadingError/Loading";
 import { allDepartment, departFetch } from "../../redux/departmentSlice";
+import { getAllDiag } from "../../redux/diagnoseSlice";
 const style = {
   position: 'absolute',
   top: '50%',
@@ -29,21 +30,17 @@ const style = {
   p: 4,
 };
 
-const MainDepartment = () => {
+const MainDiagnose = () => {
     const dispatch = useDispatch()
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-    // const department = useSelector(allDepartment)
-  const user = useSelector(state => state.auth.login?.user)
-  const success = useSelector(state => state.question.deleteQuestion?.access)
+  const {userInfo} = useSelector(state => state.auth)
+  const { pending, allDiagnose } = useSelector(state => state.diagnose)
   const navigate = useNavigate()
-  const [idQuestion, setIdQuestion] = useState('')
-  const {pending, data} = useSelector(state => state.department.allDepartment)
-  console.log(pending)
   useEffect(() => {
-    dispatch(departFetch())
-  },[])
+    dispatch(getAllDiag())
+  },[dispatch])
   const handleChange = (e) => {
     navigate(`/dpm/${e.target.dataset.id}/edit`)
   }
@@ -54,15 +51,15 @@ const MainDepartment = () => {
   }
   const handleDelete = (e) => {
     setOpen(true)
-    setIdQuestion(e.target.dataset.id)
+    // setIdQuestion(e.target.dataset.id)
   }
   return (
     <>
       <section className="content-main">
         <div className="content-header">
-          <h2 className="content-title">Danh sách chuyên khoa</h2>
+          <h2 className="content-title">Danh sách chẩn đoán</h2>
           <div>
-            <Link to="/add-dpm" className="btn btn-primary">
+            <Link to="/add-diagnose" className="btn btn-primary">
               Thêm mới
             </Link>
           </div>
@@ -111,7 +108,7 @@ const MainDepartment = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {data?.map((row) => (
+                  {allDiagnose?.map((row) => (
                     <TableRow
                       key={row._id}
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -120,7 +117,7 @@ const MainDepartment = () => {
                         {row.name}
                       </TableCell>
                       {/* <TableCell align="center"> <img src={row.image} style={{maxWidth: "100px"}}/></TableCell> */}
-                      <TableCell align="center">{row.question.length}</TableCell>
+                      <TableCell align="center">{row.question}</TableCell>
                       {/* <TableCell align="center">{row.categories?.name}</TableCell> */}
                       <TableCell align="center">{row.deanName}</TableCell>
                       <TableCell align="center"> {momment(row.createdAt).format("MMM Do YY")}</TableCell>
@@ -159,4 +156,4 @@ const MainDepartment = () => {
   )
 }
 
-export default MainDepartment
+export default MainDiagnose

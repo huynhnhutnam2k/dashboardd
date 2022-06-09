@@ -1,7 +1,7 @@
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as yup  from 'yup'
 import { addQuestionRequest, getCd } from "../../redux/apiRequest";
@@ -9,6 +9,7 @@ import Message from "../LoadingError/Error";
 import Loading from "../LoadingError/Loading";
 import Toast from "../LoadingError/Toast";
 import { useNavigate} from 'react-router-dom'
+import { addQuestion, getACd, getAQuestion } from "../../redux/questionSlice";
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -16,18 +17,18 @@ const ToastObjects = {
   autoClose: 2000,
 };
 const AddQnAMain = () => {
-  const user = useSelector(state => state.auth.login?.user) 
-  const categories = useSelector(state => state.question.getCd?.data?.categories)
-  const department = useSelector(state => state.question.getCd?.data?.department)
-  const pending = useSelector(state => state.question.addQuestion?.pending)
-  console.log(pending)
+  const userInfo = useSelector(state =>state.auth.userInfo)
+  const {categoriesCd, departmentCd} = useSelector(state => state.question)
+  const pending = useSelector(state => state.question.pending)
   const navigate = useNavigate()
   const dispatch = useDispatch()
   useEffect(() => {
-      getCd(dispatch,user?.token)
-  },[])
+      if(userInfo.token){
+        const token = userInfo?.token
+        dispatch(getACd(token))
+      }
+  },[dispatch])
   const [file, setFile] = useState('')
-  // const [reviewSource, setPreviewSource] = useState('')
   // console.log( categories)
   const handleFileInputChange = (e) => {
     const file = e.target.files[0];
@@ -58,8 +59,7 @@ const AddQnAMain = () => {
       categories: yup.string()
     }),
     onSubmit: values => {
-      // console.log(values)
-      const question = {
+      const body = {
         name: values.name,
         description: values.description,
         image: file,
@@ -68,14 +68,10 @@ const AddQnAMain = () => {
         categories: values.categories
       }
       // console.log(question)
-      addQuestionRequest(dispatch,user?.token,question)
+      const token = userInfo?.token
+      dispatch(addQuestion({body,token}))
     }
   })
-  // console.log(file)
-  // console.log(department, categories)
-  // const handleChangeCate = (e) => {
-  //   setCategoriesId(e.target.value)
-  // }
   return (
     <>
     {pending ? <p>pending</p> : ""}
@@ -140,12 +136,12 @@ const AddQnAMain = () => {
                   <div className="mb-4">
                     <select className="form-control mt-3" name="categories" value={formik.values.categories} onChange={formik.handleChange}>
                       <option value="">Categories</option>
-                      {categories?.length == undefined ? 
+                      {categoriesCd?.length == undefined ? 
                         <>
-                          <option value={categories?._id}>{categories?.name}</option>
+                          <option value={categoriesCd?._id}>{categoriesCd?.name}</option>
                         </>
                         : 
-                        categories?.map(item => (
+                        categoriesCd?.map(item => (
                         <option value={item?._id}>{item?.name}</option>
                         )
                         )}
@@ -154,7 +150,7 @@ const AddQnAMain = () => {
                   <div className="mb-4">
                     <select className="form-control mt-3" name="department" value={formik.values.department} onChange={formik.handleChange}>
                       <option value="">Department</option>
-                      { department?.map(item => (
+                      { departmentCd?.map(item => (
 
                         <option key={item._id} value={item._id}>{item.name}</option>
                        ))}

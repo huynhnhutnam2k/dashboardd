@@ -82,7 +82,7 @@ const Sidebar = () => {
                 to="/diagnose"
               >
                 <i className="icon fas fa-user"></i>
-                <span className="text">Chuẩn đoán</span>
+                <span className="text">Chẩn đoán</span>
               </NavLink>
             </li>
             {/* <li className="menu-item">

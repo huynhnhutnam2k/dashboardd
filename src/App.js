@@ -14,17 +14,26 @@ import QnAEditScreen from "./screens/QnAEditScreen";
 import DepartmentScreen from "./screens/DepartmentScreen";
 import NotFound from "./screens/NotFound";
 import PrivateRouter from "./PrivateRouter";
+import AddDpm from "./screens/AddDpm";
+import AddDiagnose from "./screens/AddDiagnose";
+import DepartEditScreen from "./screens/DepartEditScreen";
+import DiagnoseScreen from "./screens/DiagnoseScreen";
 
 function App() {
   return (
     <>
       <Router>
         <Routes>
+          //
           <Route path="/" exact element={<HomeScreen />} />
           <Route path="/qnas" element={<QnAScreen />} />
           <Route path="/add-qna" element={<AddQnA />} />
           <Route path="/add-user" element={<AddUser />} />
+          <Route path="/add-dpm" element={<AddDpm />} />
+          <Route path="/add-diagnose" element={<AddDiagnose />} />
           <Route path="/department" element={<DepartmentScreen />} />
+          <Route path="/diagnose" element={<DiagnoseScreen />} />
+          <Route path="/dpm/:id/edit" element={<DepartEditScreen />} />
           <Route path="/users" element={<UsersScreen />} />
           <Route path="/qna/:id/edit" element={<QnAEditScreen />} />
           <Route path="/login" element={<Login />} />

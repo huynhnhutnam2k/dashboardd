@@ -7,14 +7,12 @@ import * as yup from 'yup'
 import { loginRequest } from "../redux/apiRequest";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { logIn } from "../redux/authSlice";
 const Login = () => {
   window.scrollTo(0, 0);
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const pending = useSelector(state => state.auth.login?.pending)
-  const error = useSelector(state => state.auth.login?.error)
-  const msg = useSelector(state => state.auth.login?.msg)
-  console.log(msg)
+  const {loading: pending, error, msg } = useSelector(state => state.auth)
   const formik = useFormik({
     initialValues:{
       email: "",
@@ -25,16 +23,14 @@ const Login = () => {
       password: yup.string().required("required")
     }),
     onSubmit: (values)=> {
-      console.log(values)
       const user = {
         email: values.email,
         password: values.password
       }
-      loginRequest(dispatch,navigate, user)
+      // loginRequest(dispatch,navigate, user)
+      dispatch(logIn({user, navigate}))
     }
   })
-  // const redirect = location.search ? location.search.split("=")[1] : "/";
-
   return (
     <>
       

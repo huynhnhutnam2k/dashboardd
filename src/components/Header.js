@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import $ from "jquery";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutRequest } from "../redux/apiRequest";
+import { logOut } from "../redux/authSlice";
 const Header = () => {
   useEffect(() => {
     $("[data-trigger]").on("click", function (e) {
@@ -22,17 +23,18 @@ const Header = () => {
       }
     });
   }, []);
-  const user = useSelector(state => state.auth.login?.user)
+  const {userInfo} = useSelector(state => state.auth)
   const dispatch = useDispatch()
   const navigate = useNavigate()
   useEffect(()=> {  
-    if(!user){
+    if(!userInfo){
       navigate('/login')
     }
-  },[])
+  },[dispatch])
   const handleLogout = () => {
-    if(user.token){
-      logoutRequest(dispatch,user.token, user._id, navigate)
+    if(userInfo.token){
+      const {token, _id:id} = userInfo
+      dispatch(logOut({token, id}))
     }
   }
   return (

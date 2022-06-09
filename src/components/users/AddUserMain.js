@@ -9,6 +9,7 @@ import * as yup from 'yup'
 import { useFormik } from 'formik'
 import {useDispatch, useSelector} from 'react-redux'
 import { registerRequest } from "../../redux/apiRequest";
+import { addUser } from "../../redux/authSlice";
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -16,7 +17,7 @@ const ToastObjects = {
   autoClose: 2000,
 };
 const AddUserMain = () => {
-  const auth = useSelector(state => state.auth.login?.user)
+  const userInfo = useSelector(state => state.auth.userInfo)
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const formik = useFormik({
@@ -35,7 +36,6 @@ const AddUserMain = () => {
       isAdmin: yup.string().default("false")
     }),
     onSubmit : values =>{
-      // console.log(values)
       const user = {
         username : values.username,
         password: values.password,
@@ -43,11 +43,8 @@ const AddUserMain = () => {
         role: values.role,
         isAdmin: values.isAdmin
       }
-      if(auth?.token){
-        registerRequest(dispatch,auth.token,user)
-      }else{
-        navigate('/login')
-      }
+      const token = userInfo?.token
+      dispatch(addUser({token, user}))
     }
   })
   // console.log(formik.errors)
