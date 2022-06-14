@@ -8,8 +8,8 @@ import Toast from "../LoadingError/Toast";
 import * as yup from 'yup'
 import { useFormik } from 'formik'
 import {useDispatch, useSelector} from 'react-redux'
-import { registerRequest } from "../../redux/apiRequest";
 import { addUser } from "../../redux/authSlice";
+import { getACd } from "../../redux/questionSlice";
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -17,9 +17,16 @@ const ToastObjects = {
   autoClose: 2000,
 };
 const AddUserMain = () => {
-  const userInfo = useSelector(state => state.auth.userInfo)
+  const {userInfo, addUserSuccess} = useSelector(state => state.auth)
+  const { categoriesCd } = useSelector(state => state.question)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  useEffect(() => {
+    dispatch(getACd(userInfo.token))
+    if(addUserSuccess){
+      toast.success('Thêm mới thành công!!!', ToastObjects)
+    }
+  },[dispatch, addUserSuccess])
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -35,7 +42,7 @@ const AddUserMain = () => {
       role: yup.string().default("User"),
       isAdmin: yup.string().default("false")
     }),
-    onSubmit : values =>{
+    onSubmit : (values,  { resetForm }) =>{
       const user = {
         username : values.username,
         password: values.password,
@@ -45,6 +52,11 @@ const AddUserMain = () => {
       }
       const token = userInfo?.token
       dispatch(addUser({token, user}))
+      if(addUserSuccess){
+        toast.success('Thêm mới thành công!!!', ToastObjects)
+        // dispatch
+      }
+      resetForm()
     }
   })
   // console.log(formik.errors)
@@ -106,28 +118,25 @@ const AddUserMain = () => {
                     ></input>
                   </div>
                   <div className="mb-4">
-                    <label className="form-label">Role</label>
-                    <input
-                      placeholder="Nhập vào đây..."
-                      className="form-control"
-                      rows="4"
-                      value={formik.values.role}
-                      name="role"
-                      // required
-                      onChange={formik.handleChange}
-                    ></input>
+                    <select className="form-control mt-3" name="role" value={formik.values.role} onChange={formik.handleChange}>
+                      <option value="">Role</option>
+                      {categoriesCd?.length == undefined ? 
+                        <>
+                          <option value={categoriesCd?.name}>{categoriesCd?.name}</option>
+                        </>
+                        : 
+                        categoriesCd?.map(item => (
+                        <option value={item?.name}>{item?.name}</option>
+                        )
+                        )}
+                    </select>
                   </div>
                   <div className="mb-4">
-                    <label className="form-label">Is Admin</label>
-                    <input
-                      placeholder="Nhập vào đây..."
-                      className="form-control"
-                      rows="4"
-                      value={formik.values.isAdmin}
-                      name="isAdmin"
-                      // required
-                      onChange={formik.handleChange}
-                    ></input>
+                    <select className="form-control mt-3" name="isAdmin" value={formik.values.isAdmin} onChange={formik.handleChange}>
+                      <option value="">Admin</option>
+                      <option value={true}>True</option>
+                      <option value={false}>False</option>
+                    </select>
                   </div>
                   
                 </div>

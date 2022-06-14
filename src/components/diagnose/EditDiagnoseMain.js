@@ -7,7 +7,6 @@ import Loading from "../LoadingError/Loading";
 import * as yup from 'yup'
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
-import { getAQuestionRequest, getCd, updateQuestionRequest } from "../../redux/apiRequest";
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -22,8 +21,7 @@ const navigate = useNavigate()
 const user = useSelector(state => state.auth.login?.user)
 const { id } = useParams()
 const [formData, setFormData] = useState(null)
-const {data: categories, pending: pendingCate} = useSelector(state => state.question.getCd)
-const {data, pending, error} = useSelector(state => state.department.department)
+const {categoriesCd} = useSelector(state => state.question)
 // useEffect(() => {
   
 //   user.token && getCd(dispatch, user?.token)
@@ -101,10 +99,10 @@ const formik = useFormik({
                     <div className="mb-4">
                         <select className="form-control mt-3" name="categories" value={formik.values.categories} onChange={formik.handleChange}>
                         {/* <option value="">Categories</option> */}
-                        {categories?.length === undefined ? <>
+                        {categoriesCd?.length === undefined ? <>
                 
-                            <option value={categories?._id}>{categories?.name}</option>
-                            </>: categories?.map(item => (
+                            <option value={categoriesCd?._id}>{categoriesCd?.name}</option>
+                            </>: categoriesCd?.map(item => (
                             <option value={item?._id} key={item._id}>{item?.name}</option>
 
                         ))}

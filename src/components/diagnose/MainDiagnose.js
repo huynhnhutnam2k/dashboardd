@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {useDispatch, useSelector} from 'react-redux'
-import { allQuestion, deleteQuestionRequest } from "../../redux/apiRequest";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -17,7 +16,7 @@ import Stack from '@mui/material/Stack';
 import momment from 'moment'
 import Loading from "../LoadingError/Loading";
 import { allDepartment, departFetch } from "../../redux/departmentSlice";
-import { getAllDiag } from "../../redux/diagnoseSlice";
+import { delDiagnose, getAllDiag } from "../../redux/diagnoseSlice";
 const style = {
   position: 'absolute',
   top: '50%',
@@ -36,22 +35,24 @@ const MainDiagnose = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const {userInfo} = useSelector(state => state.auth)
-  const { pending, allDiagnose } = useSelector(state => state.diagnose)
+  const { pending, listDiagnose, deleteSuccess } = useSelector(state => state.diagnose)
+  const [idDiagnose, setIdDiagnose] = useState("")
   const navigate = useNavigate()
   useEffect(() => {
     dispatch(getAllDiag())
-  },[dispatch])
+  },[dispatch,deleteSuccess, listDiagnose?.length])
   const handleChange = (e) => {
-    navigate(`/dpm/${e.target.dataset.id}/edit`)
+    navigate(`/diagnose/${e.target.dataset.id}/edit`)
   }
-  const handleConfirm = async() => {
-    // await deleteQuestionRequest(dispatch,idQuestion, user?.token)
-    // setOpen(false)
-    // navigate("/qna")
+  const handleConfirm = () => {
+    const id = idDiagnose
+    const token = userInfo?.token
+    dispatch(delDiagnose({id, token}))
+    setOpen(!open)
   }
   const handleDelete = (e) => {
     setOpen(true)
-    // setIdQuestion(e.target.dataset.id)
+    setIdDiagnose(e.target.dataset.id)
   }
   return (
     <>
@@ -101,14 +102,14 @@ const MainDiagnose = () => {
                 <TableHead>
                   <TableRow>
                     <TableCell>Name</TableCell>
-                    <TableCell align="center">Số lượng câu hỏi</TableCell>
-                    <TableCell align="center">Dean name</TableCell>
+                    <TableCell align="center">Description</TableCell>
+                    <TableCell align="center">Image</TableCell>
                     <TableCell align="center">Created At</TableCell>
                     <TableCell align="center"></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {allDiagnose?.map((row) => (
+                  {listDiagnose?.map((row) => (
                     <TableRow
                       key={row._id}
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -117,9 +118,9 @@ const MainDiagnose = () => {
                         {row.name}
                       </TableCell>
                       {/* <TableCell align="center"> <img src={row.image} style={{maxWidth: "100px"}}/></TableCell> */}
-                      <TableCell align="center">{row.question}</TableCell>
+                      <TableCell align="center">{row.description}</TableCell>
                       {/* <TableCell align="center">{row.categories?.name}</TableCell> */}
-                      <TableCell align="center">{row.deanName}</TableCell>
+                      <TableCell align="center">{row.image}</TableCell>
                       <TableCell align="center"> {momment(row.createdAt).format("MMM Do YY")}</TableCell>
                       <TableCell align="center" sx={{ alignItems: 'center', display: "flex",  height: "200px", cursor: "pointer", gap: "0 15px"}}>
                         <div onClick={handleChange} data-id={row._id} className="button-parent"><ion-icon name="hammer-outline"></ion-icon></div>

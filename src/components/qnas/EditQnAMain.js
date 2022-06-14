@@ -8,8 +8,7 @@ import Loading from "../LoadingError/Loading";
 import * as yup from 'yup'
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
-import { getAQuestionRequest, getCd, updateQuestionRequest } from "../../redux/apiRequest";
-import { getAQuestion } from "../../redux/questionSlice";
+import { getACd, getAQuestion, reset, updateQuestion } from "../../redux/questionSlice";
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -19,11 +18,11 @@ const ToastObjects = {
 const EditProductMain = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const user = useSelector(state => state.auth.login?.user)
-  const categories = useSelector(state => state.question.getCd?.data?.categories)
-  const department = useSelector(state => state.question.getCd?.data?.department)
+  const {userInfo} = useSelector(state => state.auth)
+  // const {categoriesCd, departmentCd} = useSelector(state => state.question)
+  // const department = useSelector(state => state.question)
   const { id } = useParams()
-  const [formData, setFormData] = useState(null)
+  // const [formData, setFormData] = useState(null)
  
     const [file, setFile] = useState('')
     const handleFileInputChange = (e) => {
@@ -37,24 +36,26 @@ const EditProductMain = () => {
         setFile(reader.result);
       };
     };
-  const {data:question, pending} = useSelector(state => state.question.getAQuestion)
-  let init  = ""
+  const {question, pending, categoriesCd, departmentCd, updateSuccess} = useSelector(state => state.question)
+  // let init  = ""
   useLayoutEffect(()=> {
     dispatch(getAQuestion(id))
-    if(question != null){
-      init = {
-        name: question?.name,
-        description: question?.description,
-        image: question?.image,
-        answer: question?.answer,
-        department: question?.department,
-        categories: question?.categories
-      }
+    dispatch(getACd(userInfo.token))
+    if(updateSuccess){
+      toast.success('Update thành công!!!', ToastObjects)
+      dispatch(reset())
     }
-  },[dispatch,question,id])
-  console.log(init)
+  },[dispatch,updateSuccess])
+  // console.log(question)
   const formik = useFormik({
-    initialValues:init,
+    initialValues: {
+      name: question?.name,
+      description: question?.description,
+      image: question?.image,
+      answer: question?.answer,
+      department: question?.department,
+      categories: question?.categories
+    },
     validationSchema: yup.object({
       description : yup.string().required(),
       // image: yup.string(),
@@ -63,8 +64,9 @@ const EditProductMain = () => {
       department: yup.string(),
       categories: yup.string()
     }),
+    enableReinitialize: true,
     onSubmit: values => {
-      const questionUpdate = {
+      const body = {
         name: values.name,
         description: values.description,
         image: file,
@@ -72,6 +74,8 @@ const EditProductMain = () => {
         department: values.department,
         categories: values.categories
       }
+      const token = userInfo.token
+      dispatch(updateQuestion({body,token, id}))
     }
   })
   return (
@@ -137,10 +141,10 @@ const EditProductMain = () => {
                     <div className="mb-4">
                       <select className="form-control mt-3" name="categories" value={formik.values.categories} onChange={formik.handleChange}>
                         {/* <option value="">Categories</option> */}
-                        {categories?.length === undefined ? <>
+                        {categoriesCd?.length === undefined ? <>
                 
-                          <option value={categories?._id}>{categories?.name}</option>
-                          </>: categories?.map(item => (
+                          <option value={categoriesCd?._id}>{categoriesCd?.name}</option>
+                          </>: categoriesCd?.map(item => (
                           <option value={item?._id} key={item._id}>{item?.name}</option>
 
                         ))}
@@ -149,7 +153,7 @@ const EditProductMain = () => {
                     <div className="mb-4">
                       <select className="form-control mt-3" name="department" value={formik.values.department} onChange={formik.handleChange}>
                         {/* <option value="">Department</option> */}
-                        { department?.map(item => (
+                        { departmentCd?.map(item => (
 
                           <option key={item._id} value={item._id}>{item.name}</option>
                         ))}

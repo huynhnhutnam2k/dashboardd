@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {useDispatch, useSelector} from 'react-redux'
-import { allQuestion, deleteQuestionRequest } from "../../redux/apiRequest";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -16,7 +15,7 @@ import Modal from '@mui/material/Modal';
 import Stack from '@mui/material/Stack';
 import momment from 'moment'
 import Loading from "../LoadingError/Loading";
-import { allDepartment, departFetch } from "../../redux/departmentSlice";
+import { allDepartment, deleteDepart, departFetch } from "../../redux/departmentSlice";
 const style = {
   position: 'absolute',
   top: '50%',
@@ -34,27 +33,25 @@ const MainDepartment = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-    // const department = useSelector(allDepartment)
-  const user = useSelector(state => state.auth.login?.user)
-  const success = useSelector(state => state.question.deleteQuestion?.access)
+  const {userInfo} = useSelector(state => state.auth)
   const navigate = useNavigate()
-  const [idQuestion, setIdQuestion] = useState('')
-  const {pending, data} = useSelector(state => state.department.allDepartment)
-  console.log(pending)
-  useEffect(() => {
+  const [idDepart, setIdDepart] = useState('')
+  const {pending, listDepartment, deleteSuccess} = useSelector(state => state.department)
+  // console.log(pending)
+  useLayoutEffect(() => {
     dispatch(departFetch())
-  },[])
+  },[dispatch, listDepartment.length, deleteSuccess])
   const handleChange = (e) => {
     navigate(`/dpm/${e.target.dataset.id}/edit`)
   }
-  const handleConfirm = async() => {
-    // await deleteQuestionRequest(dispatch,idQuestion, user?.token)
-    // setOpen(false)
-    // navigate("/qna")
+  const handleConfirm = () => {
+    const token  = userInfo?.token
+    dispatch(deleteDepart({idDepart, token}))
+    setOpen(false)
   }
   const handleDelete = (e) => {
     setOpen(true)
-    setIdQuestion(e.target.dataset.id)
+    setIdDepart(e.target.dataset.id)
   }
   return (
     <>
@@ -111,7 +108,7 @@ const MainDepartment = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {data?.map((row) => (
+                  {listDepartment?.map((row) => (
                     <TableRow
                       key={row._id}
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}

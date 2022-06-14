@@ -15,7 +15,7 @@ import Modal from '@mui/material/Modal';
 import Stack from '@mui/material/Stack';
 import momment from 'moment'
 import Loading from "../LoadingError/Loading";
-import { deleteQuestion, getAllQuestion } from "../../redux/questionSlice";
+import { deleteTreatment, fetchTreatment } from "../../redux/treatmentSlice";
 const style = {
   position: 'absolute',
   top: '50%',
@@ -27,41 +27,40 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-const MainQnAs = () => {
+const MainTreatment = () => {
   const dispatch = useDispatch()
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const {listQuestion, pending, error, deleteSuccess} = useSelector(state => state.question)
+  const { listTreatment, pending, error, deleteSuccess} = useSelector(state => state.treatment)
   const {userInfo} = useSelector(state => state.auth)
   const navigate = useNavigate()
-  const [idQuestion, setIdQuestion] = useState('')
+  const [idTreatment, setIdTreatment] = useState('')
   // const [reload, setReload] = useState(false)
   useLayoutEffect(() => {
-    dispatch(getAllQuestion())
-  },[dispatch,listQuestion.length, deleteSuccess])
-  // console.log( question)
+    dispatch(fetchTreatment())
+  },[dispatch,listTreatment.length, deleteSuccess])
   const handleChange = (e) => {
    
-    navigate(`/qna/${e.target.dataset.id}/edit`)
+    navigate(`/treatment/${e.target.dataset.id}/edit`)
   }
   const handleConfirm = () => {
-    const id = idQuestion
+    const id = idTreatment
     const token = userInfo?.token
-    dispatch(deleteQuestion({id,token}))
+    dispatch(deleteTreatment({id,token}))
     setOpen(false)
   }
   const handleDelete = (e) => {
     setOpen(true)
-    setIdQuestion(e.target.dataset.id)
+    setIdTreatment(e.target.dataset.id)
   }
   return (
     <>
       <section className="content-main">
         <div className="content-header">
-          <h2 className="content-title">Danh sách câu hỏi</h2>
+          <h2 className="content-title">Danh sách điều trị</h2>
           <div>
-            <Link to="/add-qna" className="btn btn-primary">
+            <Link to="/add-treatment" className="btn btn-primary">
               Thêm mới
             </Link>
           </div>
@@ -112,7 +111,7 @@ const MainQnAs = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {listQuestion?.map((row) => (
+                  {listTreatment?.map((row) => (
                     <TableRow
                       key={row._id}
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -121,7 +120,7 @@ const MainQnAs = () => {
                         {row.name}
                       </TableCell>
                       <TableCell align="center"> <img src={row.image} style={{maxWidth: "100px"}}/></TableCell>
-                      <TableCell align="center">{row.department?.name}</TableCell>
+                      <TableCell align="center">{row.department}</TableCell>
                       {/* <TableCell align="center">{row.categories?.name}</TableCell> */}
                       <TableCell align="center">{row.averageMark}</TableCell>
                       <TableCell align="center"> {momment(row.createdAt).format("MMM Do YY")}</TableCell>
@@ -162,4 +161,4 @@ const MainQnAs = () => {
 
 
 
-export default MainQnAs;
+export default MainTreatment;

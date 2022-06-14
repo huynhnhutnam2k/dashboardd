@@ -4,7 +4,6 @@ import Loading from "./../components/LoadingError/Loading";
 import Toast from "./../components/LoadingError/Toast";
 import {useFormik} from 'formik'
 import * as yup from 'yup'
-import { loginRequest } from "../redux/apiRequest";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logIn } from "../redux/authSlice";

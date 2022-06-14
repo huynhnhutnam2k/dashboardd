@@ -7,7 +7,8 @@ import Loading from "../LoadingError/Loading";
 import * as yup from 'yup'
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
-import { getAQuestionRequest, getCd, updateQuestionRequest } from "../../redux/apiRequest";
+import { getACd, getAQuestion } from "../../redux/questionSlice";
+import { aDepart } from "../../redux/departmentSlice";
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -19,39 +20,38 @@ const EditDepartMain = () => {
 
 const dispatch = useDispatch()
 const navigate = useNavigate()
-const user = useSelector(state => state.auth.login?.user)
+const {userInfo} = useSelector(state => state.auth)
 const { id } = useParams()
 const [formData, setFormData] = useState(null)
-const {data: categories, pending: pendingCate} = useSelector(state => state.question.getCd)
-const {data, pending, error} = useSelector(state => state.department.department)
-// useEffect(() => {
-  
-//   user.token && getCd(dispatch, user?.token)
-// },[])
-console.log(user);
+const {categoriesCd} = useSelector(state => state.question)
+const {department, pending  } = useSelector(state => state.department)
+useEffect(() => {
+  const token = userInfo.token
+  dispatch(getACd(token))
+  dispatch(aDepart(id))
+},[dispatch])
 const formik = useFormik({
   initialValues: {
-    deanName: data?.deanName,
-    name: data?.name,
-    categoriesId: data?.categoriesId
+    deanName: department?.deanName,
+    name: department?.name,
+    categoriesId: department?.categoriesId
   },
   validationSchema: yup.object({
-
   }),
+  enableReinitialize: true,
   onSubmit: values => {
     const questionUpdate = {
-      name: values?.name,
+      name: values.name,
       deanName: values.deanName,
       categoriesId: values.categoriesId
     }
-    // updateQuestionRequest(dispatch, user?.token, questionUpdate, question?._id )
   }
 })
   return (
       <>
         <Toast />
         <section className="content-main" style={{ maxWidth: "1200px" }}>
-        <form onSubmit={formik.handleSubmit} enableReinitialize={true}  >
+        <form onSubmit={formik.handleSubmit}   >
             <div className="content-header">
             <Link to="/products" className="btn btn-danger text-white">
                 Go to products
@@ -75,7 +75,7 @@ const formik = useFormik({
                     <>
                     
                     <div className="mb-4">
-                        <label className="form-label">Dean Name</label>
+                        <label className="form-label">Name</label>
                         <input
                         placeholder="Nhập vào đây..."
                         className="form-control"
@@ -87,34 +87,30 @@ const formik = useFormik({
                         ></input>
                     </div>
                     <div className="mb-4">
-                        <label className="form-label">Name</label>
+                        <label className="form-label">Dean Name</label>
                         <input
                         placeholder="Nhập vào đây..."
                         className="form-control"
                         rows="4"
-                        name="answer"
-                        value={formik.values.answer}
+                        name="deanName"
+                        value={formik.values.deanName}
                         // required
                         onChange={formik.handleChange}
                         ></input>
                     </div>
                     <div className="mb-4">
-                        <select className="form-control mt-3" name="categories" value={formik.values.categories} onChange={formik.handleChange}>
+                        <select className="form-control mt-3" name="categoriesId" value={formik.values.categoriesId} onChange={formik.handleChange}>
                         {/* <option value="">Categories</option> */}
-                        {categories?.length === undefined ? <>
-                
-                            <option value={categories?._id}>{categories?.name}</option>
-                            </>: categories?.map(item => (
+                        {categoriesCd?.length === undefined ? <>
+                            <option value={categoriesCd?._id}>{categoriesCd?.name}</option>
+                            </>: categoriesCd?.map(item => (
                             <option value={item?._id} key={item._id}>{item?.name}</option>
-
                         ))}
                         </select>
                     </div>
-                    
                     </>
                 }
                 </div>
-                
                 </div>
             </div>
             </div>

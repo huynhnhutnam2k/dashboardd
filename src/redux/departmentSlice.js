@@ -44,11 +44,12 @@ export const editDepart = createAsyncThunk(
 )
 export const deleteDepart = createAsyncThunk(
     "deparment/del",
-    async({id, token}) => {
+    async({idDepart, token}) => {
         try {
-            const res = await axios.delete(`https://serverdhyd.herokuapp.com/api/v1/department/delete/${id}`, {
+            const res = await axios.delete(`https://serverdhyd.herokuapp.com/api/v1/department/delete/${idDepart}`, {
                 headers:{
-                    token: `Bearer ${token}`
+                    token: `Bearer ${token}`,
+                    // Access-Control-Allow-Origin: "*"
                 }
             })
             return res?.data
@@ -68,114 +69,109 @@ export const aDepart = createAsyncThunk(
         }
     }
 )
+export const departByCate = createAsyncThunk(
+    "depart/getByCate",
+    async(id) => {
+        try {
+            const res = await axios.get(`https://serverdhyd.herokuapp.com/api/v1/department/cate/${id}`)
+            return res?.data
+        } catch (error) {
+            console.log(error.response.data)
+        }
+    }
+)
 export const departmentSlice = createSlice({
     name: "department",
     initialState: {
-        departmentByCate: {
-            data: null,
-            pending: false,
-            error: false
-        },
-        department: {
-            data: {},
-            pending: false,
-            error: false
-        },
-        allDepartment: {
-            data: [],
-            pending: false,
-            error: false
-        },
-        addDepartment: {
-            success: false,
-            pending: false,
-            error: false
-        },
-        updateDepartment: {
-            pending: false,
-            success: false,
-            error: false
-        },
-        delDepartment: {
-            pending: false,
-            msg: '',
-            error: false
-        }
-    },
-    reducers: {
-        getDepartmentByCateStart: state => {
-            state.departmentByCate.pending = true
-        },
-        getDepartmentByCateAccess: (state, action) => {
-            state.departmentByCate.data = action.payload
-            state.departmentByCate.error = false
-            state.departmentByCate.pending = false
-        },
-        getDepartmentByCateFail: state => {
-            state.departmentByCate.error = true
-        }
+        listDepartment: [],
+        department: {},
+        pending: false,
+        success: false,
+        error: false,
+        addSuccess: false,
+        updateSuccess: false,
+        deleteSuccess: false,
+        msg: ''
     },
     extraReducers: builder => {
         builder
             .addCase(departFetch.pending, state => {
-                state.allDepartment.pending = true
+                state.pending = true
             })
             .addCase(departFetch.fulfilled, (state, action) =>{
-                state.allDepartment.data = action.payload
-                state.allDepartment.pending = false
+                state.listDepartment = action.payload
+                state.pending = false
             })
             .addCase(departFetch.rejected, state => {
-                state.allDepartment.error = true
+                state.error = true
+                state.pending = false
             })
             .addCase(addDepart.pending, state =>{
-                state.addDepartment.pending = true
+                state.pending = true
             })
-            .addCase(addDepart.fulfilled, (state) => {
+            .addCase(addDepart.fulfilled, (state, action) => {
                 // state.addDepartment.data = action.payload
-                state.addDepartment.pending = false
-                state.addDepartment.success= true
+                state.department = action.payload
+                state.pending = false
+                state.success= true
             })
             .addCase(addDepart.rejected, state => {
-                state.addDepartment.error = true
+                state.error = true
+                state.pending = false
             })
             .addCase(editDepart.pending , state => {
-                state.updateDepartment.pending = true
+                state.pending = true
             })
             .addCase(editDepart.fulfilled, state => {
-                state.updateDepartment.success = true
-                state.updateDepartment.pending = false
+                state.updateSuccess = true
+                state.pending = false
             })
             .addCase(editDepart.rejected, state => {
-                state.updateDepartment.error = true
+                state.error = true
+                state.pending = false
             })
             .addCase(deleteDepart.pending, state => {
-                state.delDepartment.pending = true
+                state.pending = true
             })
             .addCase(deleteDepart.fulfilled, (state, action) => {
-                state.delDepartment.pending = false
-                state.delDepartment.msg = action.payload
+                state.pending = false
+                // state.msg = action.payload
+                state.deleteSuccess = true
             })
             .addCase(deleteDepart.rejected, state => {
-                state.delDepartment.error = true
+                state.error = true
+                state.pending = false
             })
             .addCase(aDepart.pending, state => {
-                state.department.pending = true
+                state.pending = true
 
             })
             .addCase(aDepart.fulfilled, (state, action) => {
-                state.department.data = action.payload
-                state.department.pending = false
+                state.department = action.payload
+                state.pending = false
             })
             .addCase(aDepart.rejected, state => {
-                state.department.error =true
+                state.error =true
+                state.pending = false
+            })
+            .addCase(departByCate.pending, state => {
+                state.pending = true
+            })
+            .addCase(departByCate.fulfilled, (state,action) => {
+                state.listDepartment = action.payload
+                state.pending = false
+            })
+            .addCase(departByCate.rejected, state => {
+                state.pending = false
+                state.error = true
             })
     }
 })
 
-export const {
-    getDepartmentByCateAccess,
-    getDepartmentByCateFail,
-    getDepartmentByCateStart
-} = departmentSlice.actions
-export const allDepartment = (state) => state.department.allDepartment.data
+// export const {
+//     getDepartmentByCateAccess,
+//     getDepartmentByCateFail,
+//     getDepartmentByCateStart
+// } = departmentSlice.actions
+// export const allDepartment = (state) => state.department.allDepartment.data
 export default departmentSlice.reducer

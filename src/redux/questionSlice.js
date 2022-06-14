@@ -13,110 +13,13 @@ export const questionSlice = createSlice({
         deleteSuccess: false,
         addSuccess: false,
         departmentCd: null,
-        categoriesCd: null
+        categoriesCd: null,
+        questionCd:null,
     },
     reducers: {
         //get all
-        getAllStart: state =>{
-            state.allQuestion.pending = true
-        },
-        getAllSuccess : (state,action) => {
-            state.allQuestion.data = action.payload
-            state.allQuestion.error = false
-            state.allQuestion.pending = false
-        },
-        getAllFail: (state) => {
-            state.allQuestion.error = true
-        },
+        reset: (state) => {
 
-        //get cd
-        getCdStart : state => {
-            state.getCd.pending = true
-        },
-        getCdAccess: (state, action) => {
-            state.getCd.data = action.payload
-            state.getCd.pending = false
-            state.getCd.error = false
-        },
-        getCdFail:  (state) => {
-            state.getCd.error = true
-        },
-
-        //add
-        addQuestionStart: state => {
-            state.addQuestion.pending = true
-        },
-        addQuestionAccess: (state, action) => {
-            state.addQuestion.data = action.payload
-            state.addQuestion.pending = false
-            state.addQuestion.error = false
-            state.addQuestion.success = true
-        },
-        addQuestionFail: (state, action) => {
-            state.addQuestion.error = true
-            state.addQuestion.success = false
-        },
-
-        //get a question
-        getAQuesionStart: (state) =>{
-            state.getAQuestion.pending = true
-        },
-        getAQuesionAccess: (state, action) => {
-            state.getAQuestion.data = action.payload
-            state.getAQuestion.pending = false
-            state.getAQuestion.error = false
-        },
-        getAQuestionFail : state => {
-            state.getAQuestion.error = true
-        },
-
-        //update question
-        updateQuestionStart: state => {
-            state.updateQuestion.pending = true
-        },
-        updateQuestionSuccess: (state) => {
-            state.updateQuestion.pending = false
-            state.updateQuestion.success = true
-            state.updateQuestion.error = false
-        },
-        updateQuestionFail: (state) => {
-            state.updateQuestion.error = true
-        },
-
-        //delete question
-        deleteQuestionStart: state => {
-            state.deleteQuestion.pending = true
-        },
-        deleteQuestionAccess: state =>{
-            state.deleteQuestion.error = false
-            state.deleteQuestion.pending  = false
-            state.deleteQuestion.access = true
-        },
-        deleteQuestionFail: state => {
-            state.deleteQuestion.error = true
-        },
-        //get by cate
-        getQuestionByCateStart: state => {
-            state.questionByCate.pending = true
-        },
-        getQuestionByCateAccess: (state, action) => {
-            state.questionByCate.data = action.payload
-            state.questionByCate.error = false
-            state.questionByCate.pending = false
-        },
-        getQuestionByCateFail: state => {
-            state.questionByCate.error = true
-        },
-        //get question by department
-        getQuestionByDepartmentStart: state => {
-            state.questionByDepartment.pending = true
-        },
-        getQuestionByDepartmentAccess: (state, action) => {
-            state.questionByDepartment.data = action.payload
-            state.questionByDepartment.pending = false
-        },
-        getQuestionByDepartmentFail: state => {
-            state.questionByDepartment.error = true
         }
     },
     // extraReducers: builder => {
@@ -131,6 +34,8 @@ export const questionSlice = createSlice({
             .addCase(getAllQuestion.fulfilled, (state, action) => {
                 state.listQuestion = action.payload
                 state.pending = false
+                state.success = false;
+                state.error = false;
             })
             .addCase(getAllQuestion.rejected, state => {
                 state.error =  true
@@ -142,9 +47,12 @@ export const questionSlice = createSlice({
             .addCase(deleteQuestion.fulfilled, state => {
                 state.deleteSuccess = true
                 state.pending = false
+                state.success = false;
+                state.error = false;
             })
             .addCase(deleteQuestion.rejected, state => {
                 state.error = true
+                state.pending = false
             })
             .addCase(getACd.pending, state => {
                 state.pending = true
@@ -153,13 +61,81 @@ export const questionSlice = createSlice({
                 state.pending = false
                 state.categoriesCd = action.payload.categories
                 state.departmentCd = action.payload.department
+                state.questionCd = action.payload.question
+                state.success = false;
+                state.error = false;
             })
             .addCase(getACd.rejected, state => {
                 state.error = true
+                state.pending = true
+            })
+            .addCase(addQuestion.pending, state => {
+                state.pending = true
+            })
+            .addCase(addQuestion.fulfilled, (state, action)=> {
+                state.addSuccess = true
+                state.pending = false
+                state.question = action.payload
+            })
+            .addCase(addQuestion.rejected, state => {
+                state.error = true
+                state.pending =false
+            })
+            .addCase(updateQuestion.pending , state => {
+                state.pending = true
+            })
+            .addCase(updateQuestion.fulfilled, (state,action) => {
+                state.updateSuccess = true
+                state.pending = false
+            })
+            .addCase(updateQuestion.rejected, state => {
+                state.error = true
+                state.pending = false
+            })
+            .addCase(getQuestionByCate.pending, state => {
+                state.pending = true
+            })
+            .addCase(getQuestionByCate.fulfilled, (state, action) => {
+                state.listQuestion = action.payload
+                state.pending = false
+
+            })
+            .addCase(getQuestionByCate.rejected , state => {
+                state.error = true
+                state.pending = false
+            })
+            .addCase(getQuestionByDepart.pending , state => {
+                state.pending= true
+
+            })
+            .addCase(getQuestionByDepart.fulfilled, (state, action) => {
+                state.pending = false
+                state.listQuestion = action.payload
+            })
+            .addCase(getQuestionByDepart.rejected, state => {
+                state.error = true
+                state.pending = false
+            })
+            .addCase(getAQuestion.pending, state =>{
+                state.pending = true
+            })
+            .addCase(getAQuestion.fulfilled, (state, action) => {
+                state.question = action.payload
+                state.pending = false
+            })
+            .addCase(getAQuestion.rejected, state => {
+                state.error = true
+                state.pending = false
             })
     }
 })
-
+// export const resetQuestion = () => (dispatch) => {
+//     try {
+        
+//     } catch (error) {
+//         con
+//     }
+// }
 export const getAllQuestion = createAsyncThunk(
     "question/getAll",
     async() => {
@@ -270,29 +246,6 @@ export const getQuestionByDepart = createAsyncThunk(
     }
 )
 export const {
-    getAllFail,
-    getAllStart,
-    getAllSuccess,
-    getCdAccess,
-    getCdFail,getCdStart,
-    addQuestionAccess,
-    addQuestionFail,
-    addQuestionStart,
-    getAQuesionAccess,
-    getAQuesionStart,
-    getAQuestionFail,
-    updateQuestionFail,
-    updateQuestionStart,
-    updateQuestionSuccess,
-    deleteQuestionAccess,
-    deleteQuestionFail,
-    deleteQuestionStart,
-    getQuestionByCateAccess,
-    getQuestionByCateFail,
-    getQuestionByCateStart,
-    getQuestionByDepartmentAccess,
-    getQuestionByDepartmentFail,
-    getQuestionByDepartmentStart
+    reset
 } = questionSlice.actions
-
 export default questionSlice.reducer

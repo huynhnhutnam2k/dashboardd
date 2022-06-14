@@ -4,14 +4,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as yup  from 'yup'
-import { addQuestionRequest, getCd } from "../../redux/apiRequest";
 import Message from "../LoadingError/Error";
 import Loading from "../LoadingError/Loading";
 import Toast from "../LoadingError/Toast";
 import { useNavigate} from 'react-router-dom'
 import { addDepart } from "../../redux/departmentSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { getACd } from "../../redux/questionSlice";
+import { getACd, getAllQuestion } from "../../redux/questionSlice";
+import { addDiagnose } from "../../redux/diagnoseSlice";
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -21,35 +21,50 @@ const ToastObjects = {
 const AddDiagnoseMain = () => {
 
     const {userInfo} = useSelector(state => state.auth) 
-    const {categoriesCd} = useSelector(state => state.question)
-    const pending = useSelector(state => state.department.addDepartment?.pending)
+    const {categoriesCd, listQuestion} = useSelector(state => state.question)
     const navigate = useNavigate()
     const dispatch = useDispatch()
     useEffect(() => {
         getACd(dispatch,userInfo?.token)
+        dispatch(getAllQuestion())
     },[dispatch])
+    const [file, setFile] = useState('')
+    const handleFileInputChange = (e) => {
+      const file = e.target.files[0];
+      previewFile(file);
+    };
+    const previewFile = (file) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        setFile(reader.result);
+      };
+    };
     const formik = useFormik({
         initialValues: {
           name: "",
-          deanName: "",
-          categories:""
+          description: "",
+          image: "",
+          questionId: ""
         },
-        validationSchema: yup.object({
-          deanName : yup.string().required("required"),
-          name: yup.string().required("required"),
-          categories: yup.string()
-        }),
+        // validationSchema: yup.object({
+        //   deanName : yup.string().required("required"),
+        //   name: yup.string().required("required"),
+        //   categories: yup.string()
+        // }),
         onSubmit: (values) => {
           // console.log(values)
           const body = {
             name: values.name,
-            deanName: values.deanName,
-            categoriesId: values.categories
+            description: values.description,
+            questionId: values.questionId,
+            image: file
           }
+          console.log(body)
           if(userInfo.token){
             //   console.log(user.token)
               const token = userInfo.token
-              dispatch(addDepart({body, token}))
+              dispatch(addDiagnose({body, token}))
             //   console.log(originalPromiseResult)
           }
         }
@@ -63,7 +78,7 @@ const AddDiagnoseMain = () => {
             <Link to="/department" className="btn btn-danger text-white">
               Trở về
             </Link>
-            <h2 className="content-title">Thêm câu hỏi</h2>
+            <h2 className="content-title">Thêm chẩn đoán</h2>
             <div>
               <button className="btn btn-primary" type="submit">
                 Thêm
@@ -88,26 +103,29 @@ const AddDiagnoseMain = () => {
                     ></input>
                   </div>
                   <div className="mb-4">
-                    <label className="form-label">Câu trả lời</label>
+                    <label className="form-label">Mô tả</label>
                     <input
                       placeholder="Nhập vào đây..."
                       className="form-control"
                       rows="4"
-                      name="deanName"
-                      value={formik.values.deanName}
+                      name="description"
+                      value={formik.values.description}
                       // required
                       onChange={formik.handleChange}
                     ></input>
                   </div>
                   <div className="mb-4">
-                    <select className="form-control mt-3" name="categories" value={formik.values.categories} onChange={formik.handleChange}>
+                    <input className="form-control mt-3" type="file" name="image" onChange={handleFileInputChange} />
+                  </div>
+                  <div className="mb-4">
+                    <select className="form-control mt-3" name="questionId" value={formik.values.questionId} onChange={formik.handleChange}>
                       <option value="">Categories</option>
-                      {categoriesCd?.length == undefined ? 
+                      {listQuestion?.length == undefined ? 
                         <>
-                          <option value={categoriesCd?._id}>{categoriesCd?.name}</option>
+                          <option value={listQuestion?._id}>{listQuestion?.name}</option>
                         </>
                         : 
-                        categoriesCd?.map(item => (
+                        listQuestion?.map(item => (
                         <option value={item?._id}>{item?.name}</option>
                         )
                         )}

@@ -85,6 +85,16 @@ const Sidebar = () => {
                 <span className="text">Chẩn đoán</span>
               </NavLink>
             </li>
+            <li className="menu-item">
+              <NavLink
+                activeClassName="active"
+                className="menu-link"
+                to="/treatment"
+              >
+                <i className="icon fas fa-user"></i>
+                <span className="text">Điều trị</span>
+              </NavLink>
+            </li>
             {/* <li className="menu-item">
               <NavLink
                 activeClassName="active"

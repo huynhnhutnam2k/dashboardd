@@ -26,11 +26,22 @@ export const getADiag = createAsyncThunk(
 )
 export const getDiagByQuestion = createAsyncThunk(
     "diagnose/getByQuestion", 
-    async({idQuestion}) => {
+    async(query) => {
         try {
-            const {data} = await axios.get(`${url}/diagnose/question/${idQuestion}`)
+            const {data} = await axios.get(`${url}/diagnose/question/${query}`)
             return data
         } catch (error) {
+            console.log(error.response.data)
+        }
+    }
+)
+export const getDiagnoseByQuery = createAsyncThunk(
+    "diagnose/getByQuery",
+    async(query) => {
+        try{
+            const res = await axios.get(`${url}/diagnose/search?${query}`)
+            return res.data
+        }catch(error){
             console.log(error.response.data)
         }
     }
@@ -102,7 +113,7 @@ export const diagnoseSlice = createSlice({
                 state.pending = true
             })
             .addCase(getAllDiag.fulfilled, (state, action) => {
-                state.allDiagnose = action.payload
+                state.listDiagnose = action.payload
                 state.pending = false
             })
             .addCase(getAllDiag.rejected, state => {
@@ -164,6 +175,17 @@ export const diagnoseSlice = createSlice({
             .addCase(delDiagnose.rejected, state => {
                 state.error = true
                 state.pending = false
+            })
+            .addCase(getDiagnoseByQuery.pending , state => {
+                state.pending = true
+            })
+            .addCase(getDiagnoseByQuery.fulfilled, (state , action) => {
+                state.listDiagnose = action.payload
+                state.pending = false
+            })
+            .addCase(getDiagnoseByQuery.rejected, state => {
+                state.pending = false
+                state.error = true
             })
     }
 })

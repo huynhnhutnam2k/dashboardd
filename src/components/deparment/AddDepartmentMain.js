@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as yup  from 'yup'
-import { addQuestionRequest, getCd } from "../../redux/apiRequest";
 import Message from "../LoadingError/Error";
 import Loading from "../LoadingError/Loading";
 import Toast from "../LoadingError/Toast";
@@ -22,7 +21,7 @@ const AddDepartmentMain = () => {
 
     const {userInfo} = useSelector(state => state.auth) 
     const {categoriesCd} = useSelector(state => state.question)
-    const pending = useSelector(state => state.department.addDepartment?.pending)
+    // const pending = useSelector(state => state.department.addDepartment?.pending)
     const navigate = useNavigate()
     const dispatch = useDispatch()
     useEffect(() => {
@@ -64,7 +63,7 @@ const AddDepartmentMain = () => {
             <Link to="/department" className="btn btn-danger text-white">
               Trở về
             </Link>
-            <h2 className="content-title">Thêm câu hỏi</h2>
+            <h2 className="content-title">Thêm chuyên khoa</h2>
             <div>
               <button className="btn btn-primary" type="submit">
                 Thêm

@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as yup  from 'yup'
-import { addQuestionRequest, getCd } from "../../redux/apiRequest";
 import Message from "../LoadingError/Error";
 import Loading from "../LoadingError/Loading";
 import Toast from "../LoadingError/Toast";
@@ -29,7 +28,6 @@ const AddQnAMain = () => {
       }
   },[dispatch])
   const [file, setFile] = useState('')
-  // console.log( categories)
   const handleFileInputChange = (e) => {
     const file = e.target.files[0];
     previewFile(file);

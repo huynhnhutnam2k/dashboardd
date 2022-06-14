@@ -18,6 +18,9 @@ import AddDpm from "./screens/AddDpm";
 import AddDiagnose from "./screens/AddDiagnose";
 import DepartEditScreen from "./screens/DepartEditScreen";
 import DiagnoseScreen from "./screens/DiagnoseScreen";
+import TreatmentScreen from "./screens/TreatmentScreen";
+import AddTreatment from "./screens/AddTreatment";
+import TreatmentEditScreen from "./screens/TreatmentEditScreen";
 
 function App() {
   return (
@@ -31,7 +34,10 @@ function App() {
           <Route path="/add-user" element={<AddUser />} />
           <Route path="/add-dpm" element={<AddDpm />} />
           <Route path="/add-diagnose" element={<AddDiagnose />} />
+          <Route path="/add-treatment" element={<AddTreatment />} />
           <Route path="/department" element={<DepartmentScreen />} />
+          <Route path="/treatment" element={<TreatmentScreen />} />
+          <Route path="/treatment/:id/edit" element={<TreatmentEditScreen />} />
           <Route path="/diagnose" element={<DiagnoseScreen />} />
           <Route path="/dpm/:id/edit" element={<DepartEditScreen />} />
           <Route path="/users" element={<UsersScreen />} />
