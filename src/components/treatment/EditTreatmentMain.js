@@ -70,7 +70,7 @@ const EditTreatmentMain = () => {
           desc: desc,
           name: values?.name,
           note: values?.note,
-          isTrue: values.isTrue,
+          isTrue: values?.isTrue,
           situation: values?.situation,
           diagnose: values?.diagnose,
         };
@@ -78,6 +78,7 @@ const EditTreatmentMain = () => {
 
       // console.log(body)
       const token = userInfo?.token;
+      // console.log(body);
       dispatch(updateTreatment({ id, body, token }));
       // console.log(body);
     },
