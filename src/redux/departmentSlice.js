@@ -1,11 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import {URL} from './url'
 export const departFetch = createAsyncThunk(
     "department/fetchAll",
     async() => {
         try{
-            const res = await axios.get(`https://serverdhyd.herokuapp.com/api/v1/department`)
+            const res = await axios.get(`https://sv-dhyd.herokuapp.com/api/department`,{
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                }
+            })
             return res?.data
         }catch(error){
             console.log(error.response.data)
@@ -16,9 +20,13 @@ export const addDepart = createAsyncThunk(
     "department/add",
     async({body, token}) => {   
         try{
-            const res = await axios.post("https://serverdhyd.herokuapp.com/api/v1/department/add", body, {
+            const res = await axios.post("https://sv-dhyd.herokuapp.com/api/department", body, {
                 headers: {
-                    token: `Bearer ${token}`
+                    token: `Bearer ${token}`,
+                    Vary: 'Origin',
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+               
                 }
             })
             return res.data
@@ -29,11 +37,15 @@ export const addDepart = createAsyncThunk(
 )
 export const editDepart = createAsyncThunk(
     "department/edit", 
-    async({body, token, idDepart}) => {
+    async({body, token, id}) => {
         try {
-            const res = await axios.put(`https://serverdhyd.herokuapp.com/api/v1/department/update/${idDepart}`, body, {
+            const res = await axios.put(`https://sv-dhyd.herokuapp.com/api/department/${id}`, body, {
                 headers: {
-                    token: `Bearer ${token}`
+                    token: `Bearer ${token}`,
+                    
+                        "Content-Type": "application/json",
+                        "Access-Control-Allow-Origin": "*"
+                    
                 }
             })
             return res.data
@@ -46,10 +58,14 @@ export const deleteDepart = createAsyncThunk(
     "deparment/del",
     async({idDepart, token}) => {
         try {
-            const res = await axios.delete(`https://serverdhyd.herokuapp.com/api/v1/department/delete/${idDepart}`, {
+            const res = await axios.delete(`https://sv-dhyd.herokuapp.com/api/department/${idDepart}`, {
                 headers:{
                     token: `Bearer ${token}`,
+                    Vary: 'Origin',
                     // Access-Control-Allow-Origin: "*"
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                    
                 }
             })
             return res?.data
@@ -62,7 +78,12 @@ export const aDepart = createAsyncThunk(
     "depart/aDepart",
     async(id) => {
         try{
-            const { data } = await axios.get(`https://serverdhyd.herokuapp.com/api/v1/department/${id}`)
+            const { data } = await axios.get(`https://sv-dhyd.herokuapp.com/api/department/${id}`,{
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                }
+            })
             return data
         }catch(error){
             console.log(error.response.data)
@@ -73,7 +94,12 @@ export const departByCate = createAsyncThunk(
     "depart/getByCate",
     async(id) => {
         try {
-            const res = await axios.get(`https://serverdhyd.herokuapp.com/api/v1/department/cate/${id}`)
+            const res = await axios.get(`https://serverdhyd.herokuapp.com/api/v1/department/cate/${id}`,{
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                }
+            })
             return res?.data
         } catch (error) {
             console.log(error.response.data)
@@ -113,7 +139,7 @@ export const departmentSlice = createSlice({
                 // state.addDepartment.data = action.payload
                 state.department = action.payload
                 state.pending = false
-                state.success= true
+                state.addSuccess= true
             })
             .addCase(addDepart.rejected, state => {
                 state.error = true
@@ -134,9 +160,9 @@ export const departmentSlice = createSlice({
                 state.pending = true
             })
             .addCase(deleteDepart.fulfilled, (state, action) => {
+                state.deleteSuccess = true
                 state.pending = false
                 // state.msg = action.payload
-                state.deleteSuccess = true
             })
             .addCase(deleteDepart.rejected, state => {
                 state.error = true
@@ -168,10 +194,4 @@ export const departmentSlice = createSlice({
     }
 })
 
-// export const {
-//     getDepartmentByCateAccess,
-//     getDepartmentByCateFail,
-//     getDepartmentByCateStart
-// } = departmentSlice.actions
-// export const allDepartment = (state) => state.department.allDepartment.data
 export default departmentSlice.reducer

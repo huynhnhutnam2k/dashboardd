@@ -4,6 +4,7 @@
 INCLUDE STYLES AND COMPONENTS
 ===================== */
 /* ================== HELPERS =================== */
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;300;500;600;700&display=swap');
 .table thead th {
   color: #adb5bd;
   font-weight: 400;
@@ -151,8 +152,20 @@ a.disabled {
 body {
   position: relative;
   min-height: 100vh;
+  font-family: 'Josefin Sans', sans-serif !important;
 }
 
+select{ 
+  font-family: 'Josefin Sans', sans-serif !important;
+  /* display: block; */
+}
+select::-ms-expand {
+  font-family: 'Josefin Sans', sans-serif !important;
+  /* display: none; */
+}
+option{
+  font-family: 'Josefin Sans', sans-serif ;
+}
 body.offcanvas-active {
   overflow: hidden;
 }
@@ -168,7 +181,30 @@ body.offcanvas-active {
   margin-left: auto;
   margin-right: auto;
 }
-
+.button-group{
+  display: flex;
+  gap: 0 20px;
+}
+.button-check{
+  padding: 5px 20px;
+  background-color: white;
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 150px;
+  /* text-transform: uppercase; */
+  border-radius: 20px;
+  border: 1px solid black;
+  text-transform: capitalize ;
+  transition: all .25s ease;
+  cursor: pointer;
+}
+.button-check.isCheck{
+  background-color: #0072BB;
+  color: white;
+  border:0;
+}
 .navbar-aside {
   max-width: 260px;
   display: block;
@@ -828,7 +864,14 @@ ul.row-sm {
 .form-inline input[type="number"] {
   max-width: 100px;
 }
-
+.form-control{
+      -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    text-overflow: '';
+    /* font-family: "jose"; */
+    font-family: 'Josefin Sans', sans-serif ;
+}
 .form-control:hover,
 .form-select:hover {
   border-color: #0072BB;

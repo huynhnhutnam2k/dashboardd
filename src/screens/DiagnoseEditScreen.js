@@ -1,8 +1,8 @@
 import Sidebar from "../components/sidebar";
 import Header from "../components/Header";
-// import EditQnAMain from "../components/qnas/EditQnAMain";
-import EditQnAMain from "../components/qnas/EditQnAMain";
-const QnAEditScreen = () => {
+// import EditDepartMain from "../components/deparment/EditDepartMain";
+import EditDiagnoseMain from "../components/diagnose/EditDiagnoseMain";
+const DiagnoseEditMain = () => {
   // const productId = match.params.id;
 
   return (
@@ -10,9 +10,9 @@ const QnAEditScreen = () => {
       <Sidebar />
       <main className="main-wrap">
         <Header />
-        <EditQnAMain  />
+        <EditDiagnoseMain  />
       </main>
     </>
   );
 };
-export default QnAEditScreen;
+export default DiagnoseEditMain;

@@ -10,55 +10,68 @@ import Toast from "../LoadingError/Toast";
 import { useNavigate} from 'react-router-dom'
 import { addDepart } from "../../redux/departmentSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { getACd, getAllQuestion } from "../../redux/questionSlice";
+import { getACd, getAllQuestion, reset } from "../../redux/questionSlice";
 import { addDiagnose, getDiagByQuestion, getDiagnoseByQuery } from "../../redux/diagnoseSlice";
 import { createTreatment } from "../../redux/treatmentSlice";
+import { getByRole } from "../../redux/authSlice";
+import SunEditor, { buttonList } from 'suneditor-react';
+import 'suneditor/dist/css/suneditor.min.css';
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
   pauseOnHouver: false,
   autoClose: 2000,
+  fontFamily: 'Josefin Sans'
 };
 const AddTreatmentMain = () => {
 
-    const {userInfo} = useSelector(state => state.auth) 
-    const {questionCd} = useSelector(state => state.question)
+    const {userInfo, situation: questionCd} = useSelector(state => state.auth) 
     const {listDiagnose} = useSelector(state => state.diagnose)
+    const {addSuccess, error} = useSelector(state => state.treatment)
     const [query, setQuery ] = useState("")
     const [name, setName] = useState("")
-    const [note, setNote] = useState("")
-    const [desc, setDesc] = useState("")
-    const [result, setResult] = useState("")
-    const [questionId, setQuestionId] = useState()
-    const [diagnoseId, setDiagnoseId] = useState("")
+    const [note, setNote] = useState(" ")
+    // const [desc, setDesc] = useState("")
+    const [isTrue, setIsTrue] = useState(false)
+    const [situation, setSituation] = useState()
+    const [diagnose, setDiagnose] = useState("")
+    const [checked, setChecked] = useState(false)
     const navigate = useNavigate()
     const dispatch = useDispatch()
     useEffect(() => {
         const token = userInfo?.token
-        dispatch(getACd(token))
-        // dispatch(getAllQuestion())
+        dispatch(getByRole(token))
         dispatch(getDiagByQuestion(query))
-    },[dispatch, questionId])
-    // us
-
-    console.log(listDiagnose)
+        if(addSuccess){
+          toast.success("Them moi thanh cong", ToastObjects)
+          dispatch(reset())
+        }
+        if(error){
+          toast.error("Them moi that bai", ToastObjects)
+          dispatch(reset())
+        }
+    },[dispatch, situation, addSuccess, error])
+    const [desc, setDesc ] = useState(null)
+    const handleChangeDesc = (content) => {
+      setDesc(content)
+    }
     const handleSubmit = (e) => {
       e.preventDefault()
       const treatment = {
         name: name,
         desc: desc, 
         note: note, 
-        result: result,
-        questionId: questionId,
-        diagnoseId: diagnoseId
+        isTrue: isTrue,
+        situation: situation,
+        diagnose: diagnose
       }
-      // console.log(name, desc, note, result, questionId, diagnoseId)
       const token = userInfo?.token
-      dispatch(createTreatment({treatment, token}))
+      // console.log(treatment)
+      dispatch(createTreatment(treatment, token))
     }
     const handleChange = (e) => {
       setQuery(e.target.value)
-      setQuestionId(e.target.value)
+      setSituation(e.target.value)
     }
   return (
     <>
@@ -66,7 +79,7 @@ const AddTreatmentMain = () => {
       <section className="content-main" style={{ maxWidth: "1200px" }}>
         <form onSubmit={handleSubmit}  encType="multipart/form-data">
           <div className="content-header">
-            <Link to="/department" className="btn btn-danger text-white">
+            <Link to="/treatment" className="btn btn-danger text-white">
               Trở về
             </Link>
             <h2 className="content-title">Thêm cách điều trị</h2>
@@ -93,29 +106,26 @@ const AddTreatmentMain = () => {
                       onChange={(e) => setName(e.target.value)}
                     ></input>
                   </div>
-                  <div className="mb-4">
-                    <label className="form-label">Mô tả</label>
+                  
+                  <h6>Mô tả</h6>
+                  <SunEditor className="mb-4 " onChange={handleChangeDesc}  setOptions={{buttonList: buttonList.complex , height: 500}}/>
+                  <h6 className="mt-4">Kết quả điều trị</h6>
+                  <div className="mb-4  button-group">
+                    <div className={`button-check ${isTrue ? "isCheck" : ""}`}  onClick={() => setIsTrue(true)}> Thành công</div>
+                    <div className={`button-check ${isTrue == false ? "isCheck" : ""}`} onClick={() => setIsTrue(false)}>Thất bại</div>
+                    {/* <label className="form-label">Kết quả</label>
                     <input
                       placeholder="Nhập vào đây..."
-                      className="form-control"
+                      // className="form-control"
                       rows="4"
-                      name="desc"
-                      value={desc}
+                      name="isTrue"
+                      value={isTrue}
+                      checked={isTrue}
                       // required
-                      onChange={e => setDesc(e.target.value)}
-                    ></input>
-                  </div>
-                  <div className="mb-4">
-                    <label className="form-label">Kết quả</label>
-                    <input
-                      placeholder="Nhập vào đây..."
-                      className="form-control"
-                      rows="4"
-                      name="result"
-                      value={result}
-                      // required
-                      onChange={e => setResult(e.target.value)}
-                    ></input>
+                      style={{width: '50px', height: "50px", display: "flex",flexDerection: "column"}}
+                      type="checkbox"
+                      onChange={e => setIsTrue(!isTrue)}
+                    ></input> */}
                   </div>
                   <div className="mb-4">
                     <label className="form-label">Chú ý</label>
@@ -130,7 +140,7 @@ const AddTreatmentMain = () => {
                     ></input>
                   </div>
                   <div className="mb-4">
-                    <select className="form-control mt-3" name="questionId" value={questionId} onChange={handleChange}>
+                    <select className="form-control mt-3" name="situation" value={situation} onChange={handleChange}>
                       <option value="">Tình huống</option>
                       {questionCd?.length == undefined ? 
                         <>
@@ -144,7 +154,7 @@ const AddTreatmentMain = () => {
                     </select>
                   </div>
                   <div className="mb-4">
-                    <select className="form-control mt-3" name="diagnoseId" value={diagnoseId} onChange={e => setDiagnoseId(e.target.value)}>
+                    <select className="form-control mt-3" name="diagnose" value={diagnose} onChange={e => setDiagnose(e.target.value)}>
                       <option value="">Chẩn đoán</option>
                       {listDiagnose?.length == undefined ? 
                         <>
@@ -152,7 +162,7 @@ const AddTreatmentMain = () => {
                         </>
                         : 
                         listDiagnose?.map(item => (
-                        <option value={item?._id}>{item?.name}</option>
+                        <option value={item?._id} key={item._id}>{item?.name}</option>
                         )
                         )}
                     </select>

@@ -4,12 +4,14 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Message from "../LoadingError/Error";
 import Loading from "../LoadingError/Loading";
-import * as yup from 'yup'
+import * as yup from "yup";
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import { getDiagByQuestion } from "../../redux/diagnoseSlice";
-import { getACd } from "../../redux/questionSlice";
-import { fetchOneTreatment } from "../../redux/treatmentSlice";
+import { getACd, reset } from "../../redux/questionSlice";
+import { fetchOneTreatment, updateTreatment } from "../../redux/treatmentSlice";
+import { getByRole } from "../../redux/authSlice";
+import SunEditor, { buttonList } from "suneditor-react";
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -17,162 +19,224 @@ const ToastObjects = {
   autoClose: 2000,
 };
 const EditTreatmentMain = () => {
-    
-// const user = useSelector(state => state.auth.login?.user)
-const {userInfo} = useSelector(state => state.auth)
-const { id } = useParams()
-const [formData, setFormData] = useState(null)
-const {pending, questionCd, error} = useSelector(state => state.question)
-const {treatment} = useSelector(state => state.treatment)
-const {listDiagnose} = useSelector(state => state.diagnose)
-    const [query, setQuery ] = useState("")
-    const [name, setName] = useState(treatment.name || "")
-    const [note, setNote] = useState(treatment.note ||"")
-    const [desc, setDesc] = useState(treatment.desc || "")
-    const [result, setResult] = useState( treatment.result || "")
-    const [questionId, setQuestionId] = useState(treatment.questionId || "")
-    const [diagnoseId, setDiagnoseId] = useState(treatment.diagnoseId || "")
-    const navigate = useNavigate()
-    const dispatch = useDispatch()
-    useEffect(() => {
-        const token = userInfo?.token
-        dispatch(getACd(token))
-        // dispatch(getAllQuestion())
-        dispatch(getDiagByQuestion(query))
-        dispatch(fetchOneTreatment(id))
-    },[dispatch, questionId])
-    // us
+  const { userInfo } = useSelector((state) => state.auth);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { treatment, pending, updateSuccess } = useSelector(
+    (state) => state.treatment
+  );
+  const { situation: situationRole } = useSelector((state) => state.auth);
+  const [editDesc, setEditDesc] = useState(false);
+  const [query, setQuery] = useState(treatment?.situation?._id);
+  const [isTrue, setIsTrue] = useState(treatment.isTrue);
+  useEffect(() => {
+    const token = userInfo?.token;
+    dispatch(getByRole(token));
+    dispatch(fetchOneTreatment(id));
+    dispatch(getDiagByQuestion(query));
+    if (updateSuccess) {
+      toast.success("Cập nhật tình huống thành công!!!", ToastObjects);
+      dispatch(reset());
+    }
+  }, [dispatch, query, updateSuccess]);
+  const { listDiagnose } = useSelector((state) => state.diagnose);
+  const [desc, setDesc] = useState(treatment?.desc);
+  const formik = useFormik({
+    initialValues: {
+      desc: treatment?.desc,
+      name: treatment?.name,
+      note: treatment?.note,
+      isTrue: treatment?.isTrue,
+      situation: treatment?.situation,
+      diagnose: treatment?.diagnose,
+    },
 
-    console.log(listDiagnose)
-    const handleSubmit = (e) => {
-      e.preventDefault()
-      const treatment = {
-        name: name,
-        desc: desc, 
-        note: note, 
-        result: result,
-        questionId: questionId,
-        diagnoseId: diagnoseId
+    validationSchema: yup.object({}),
+    enableReinitialize: true,
+    onSubmit: (values) => {
+      let body;
+      if (editDesc === false) {
+        body = {
+          desc: values.desc,
+          name: values.name,
+          isTrue: values.isTrue,
+          situation: values.situation,
+          diagnose: values.diagnose,
+          note: values.note,
+        };
+      } else {
+        body = {
+          desc: desc,
+          name: values?.name,
+          note: values?.note,
+          isTrue: values.isTrue,
+          situation: values?.situation,
+          diagnose: values?.diagnose,
+        };
       }
-      // console.log(name, desc, note, result, questionId, diagnoseId)
-      const token = userInfo?.token
-    //   dispatch(createTreatment({treatment, token}))
-    }
-    const handleChange = (e) => {
-      setQuery(e.target.value)
-      setQuestionId(e.target.value)
-    }
+
+      // console.log(body)
+      const token = userInfo?.token;
+      dispatch(updateTreatment({ id, body, token }));
+      // console.log(body);
+    },
+  });
+
+  const handleChangeDesc = (content) => {
+    setDesc(content);
+  };
+  // console.log(editDesc)
   return (
     <>
-    <Toast />
-  <section className="content-main" style={{ maxWidth: "1200px" }}>
-    <form onSubmit={handleSubmit}  encType="multipart/form-data">
-      <div className="content-header">
-        <Link to="/department" className="btn btn-danger text-white">
-          Trở về
-        </Link>
-        <h2 className="content-title">Thêm câu hỏi</h2>
-        <div>
-          <button className="btn btn-primary" type="submit">
-            Thêm
-          </button>
-        </div>
-      </div>
-
-      <div className="row mb-4">
-        <div className="col-xl-12 col-lg-12">
-          <div className="card mb-4 shadow-sm">
-            <div className="card-body">
-              <div className="mb-4">
-                <label className="form-label">Tên</label>
-                <input
-                  placeholder="Nhập vào đây..."
-                  className="form-control"
-                  // rows="4"
-                  name="name"
-                  value={name}
-                  // required
-                  onChange={(e) => setName(e.target.value)}
-                ></input>
-              </div>
-              <div className="mb-4">
-                <label className="form-label">Mô tả</label>
-                <input
-                  placeholder="Nhập vào đây..."
-                  className="form-control"
-                  rows="4"
-                  name="desc"
-                  value={desc}
-                  // required
-                  onChange={e => setDesc(e.target.value)}
-                ></input>
-              </div>
-              <div className="mb-4">
-                <label className="form-label">Kết quả</label>
-                <input
-                  placeholder="Nhập vào đây..."
-                  className="form-control"
-                  rows="4"
-                  name="result"
-                  value={result}
-                  // required
-                  onChange={e => setResult(e.target.value)}
-                ></input>
-              </div>
-              <div className="mb-4">
-                <label className="form-label">Chú ý</label>
-                <input
-                  placeholder="Nhập vào đây..."
-                  className="form-control"
-                  rows="4"
-                  name="note"
-                  value={note}
-                  // required
-                  onChange={e => setNote(e.target.value)}
-                ></input>
-              </div>
-              <div className="mb-4">
-                <select className="form-control mt-3" name="questionId" value={questionId} onChange={handleChange}>
-                  <option value="">Tình huống</option>
-                  {questionCd?.length == undefined ? 
+      <Toast />
+      <section className="content-main" style={{ maxWidth: "1200px" }}>
+        <form onSubmit={formik.handleSubmit} encType="multipart/form-data">
+          <div className="content-header">
+            <Link to="/treatment" className="btn btn-danger text-white">
+              Trở về
+            </Link>
+            <h2 className="content-title">Cập nhật điều trị</h2>
+            <div>
+              <button className="btn btn-primary" type="submit">
+                Cập nhật
+              </button>
+            </div>
+          </div>
+          <div className="row mb-4">
+            <div className="col-xl-12 col-lg-12">
+              <div className="card mb-4 shadow-sm">
+                <div className="card-body">
+                  {pending ? (
+                    <Loading />
+                  ) : (
                     <>
-                      <option value={questionCd?._id}>{questionCd?.name}</option>
+                      <div className="mb-4">
+                        <label className="form-label">Tên</label>
+                        <input
+                          placeholder="Nhập vào đây..."
+                          className="form-control"
+                          name="name"
+                          value={formik.values.name}
+                          onChange={formik.handleChange}
+                        ></input>
+                      </div>
+                      <div className="mb-4">
+                        <label className="form-label">Mô tả</label>
+                        <div
+                          className="form-control"
+                          dangerouslySetInnerHTML={{
+                            __html: `${formik.values.desc}`,
+                          }}
+                        />
+                      </div>
+                      <h6>Bạn có muốn sửa mô tả không?</h6>
+                      <div className="button-group">
+                        <div
+                          className={`button-check ${
+                            editDesc == false ? "isCheck" : ""
+                          }`}
+                          onClick={() => setEditDesc(false)}
+                        >
+                          Không
+                        </div>
+                        <div
+                          className={`button-check ${
+                            editDesc ? "isCheck" : ""
+                          }`}
+                          onClick={() => setEditDesc(true)}
+                        >
+                          Có
+                        </div>
+                      </div>
+                      {editDesc && (
+                        <SunEditor
+                          className="mb-4"
+                          onChange={handleChangeDesc}
+                          setOptions={{
+                            buttonList: buttonList.complex,
+                            height: 500,
+                            value: formik.values.desc,
+                          }}
+                        />
+                      )}
+                      <h6 className="mt-4">Kết quả điều trị</h6>
+                      <div className="mb-4  button-group">
+                        <div
+                          className={`button-check ${
+                            formik.values.isTrue ? "isCheck" : ""
+                          }`}
+                          onClick={() => formik.setFieldValue("isTrue", true)}
+                        >
+                          {" "}
+                          Đúng
+                        </div>
+                        <div
+                          className={`button-check ${
+                            formik.values.isTrue == false ? "isCheck" : ""
+                          }`}
+                          onClick={() => formik.setFieldValue("isTrue", false)}
+                        >
+                          Sai
+                        </div>
+                      </div>
+                      <div className="mb-4">
+                        <label className="form-label">Chú ý</label>
+                        <input
+                          placeholder="Nhập vào đây..."
+                          className="form-control"
+                          rows="4"
+                          name="note"
+                          value={formik.values.note}
+                          onChange={formik.handleChange}
+                        ></input>
+                      </div>
+                      <div className="mb-4">
+                        <select
+                          className="form-control mt-3"
+                          name="situation"
+                          value={formik.values.situation}
+                          onChange={(e) => {
+                            setQuery(e.target.value);
+                            formik.handleChange(e);
+                          }}
+                        >
+                          <option value={treatment?.situation?._id}>
+                            {treatment?.situation?.name}
+                          </option>
+                          {situationRole?.map((item) =>
+                            item._id !== treatment?.situation?._id ? (
+                              <option key={item._id} value={item._id}>
+                                {item.name}
+                              </option>
+                            ) : null
+                          )}
+                        </select>
+                      </div>
+                      <div className="mb-4">
+                        <select
+                          className="form-control mt-3"
+                          name="diagnose"
+                          value={formik.values.diagnose}
+                          onChange={formik.handleChange}
+                        >
+                          {listDiagnose?.map((item) =>
+                            item._id !== treatment?.diagnose?._id ? (
+                              <option value={item?._id}>{item?.name}</option>
+                            ) : null
+                          )}
+                        </select>
+                      </div>
                     </>
-                    : 
-                    questionCd?.map(item => (
-                    <option value={item?._id}>{item?.name}</option>
-                    )
-                    )}
-                </select>
-              </div>
-              <div className="mb-4">
-                <select className="form-control mt-3" name="diagnoseId" value={diagnoseId} onChange={e => setDiagnoseId(e.target.value)}>
-                  <option value="">Chẩn đoán</option>
-                  {listDiagnose?.length == undefined ? 
-                    <>
-                      <option value={listDiagnose?._id}>{listDiagnose?.name}</option>
-                    </>
-                    : 
-                    listDiagnose?.map(item => (
-                    <option value={item?._id}>{item?.name}</option>
-                    )
-                    )}
-                </select>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </form>
-  </section>
-</>
-  )
-}
+        </form>
+      </section>
+    </>
+  );
+};
 
-export default EditTreatmentMain
-
-
-        
-        
-        
-
+export default EditTreatmentMain;

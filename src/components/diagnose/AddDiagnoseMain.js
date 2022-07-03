@@ -10,8 +10,11 @@ import Toast from "../LoadingError/Toast";
 import { useNavigate} from 'react-router-dom'
 import { addDepart } from "../../redux/departmentSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { getACd, getAllQuestion } from "../../redux/questionSlice";
+import { getACd, getAllQuestion, reset } from "../../redux/questionSlice";
 import { addDiagnose } from "../../redux/diagnoseSlice";
+import { getByRole } from "../../redux/authSlice";
+import SunEditor, { buttonList } from 'suneditor-react';
+import 'suneditor/dist/css/suneditor.min.css';
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -20,55 +23,57 @@ const ToastObjects = {
 };
 const AddDiagnoseMain = () => {
 
-    const {userInfo} = useSelector(state => state.auth) 
-    const {categoriesCd, listQuestion} = useSelector(state => state.question)
+    const {userInfo,situation} = useSelector(state => state.auth) 
+    const  { addSuccess, error} = useSelector(state =>  state.diagnose)
     const navigate = useNavigate()
     const dispatch = useDispatch()
     useEffect(() => {
-        getACd(dispatch,userInfo?.token)
-        dispatch(getAllQuestion())
-    },[dispatch])
+        dispatch(getByRole(userInfo?.token))
+        if(addSuccess){
+          toast.success("Them thannh cong", ToastObjects)
+          dispatch(reset())
+        }
+        if(error){
+          toast.error("Them that bai", ToastObjects)
+          dispatch(reset())
+        }
+    },[dispatch, addSuccess, error])
     const [file, setFile] = useState('')
-    const handleFileInputChange = (e) => {
-      const file = e.target.files[0];
-      previewFile(file);
-    };
-    const previewFile = (file) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = () => {
-        setFile(reader.result);
-      };
-    };
+    const [isTrue, setIsTrue] = useState("")
+
+    const [desc, setDesc ] = useState(null)
+    const handleChangeDesc = (content) => {
+      setDesc(content)
+    }
     const formik = useFormik({
         initialValues: {
           name: "",
-          description: "",
-          image: "",
-          questionId: ""
+          desc: "",
+          situationId: "",
+          isTrue: isTrue
         },
-        // validationSchema: yup.object({
-        //   deanName : yup.string().required("required"),
-        //   name: yup.string().required("required"),
-        //   categories: yup.string()
-        // }),
         onSubmit: (values) => {
-          // console.log(values)
           const body = {
             name: values.name,
-            description: values.description,
-            questionId: values.questionId,
-            image: file
+            desc: desc,
+            situationId: values.situationId,
+            isTrue: isTrue
           }
-          console.log(body)
+          // console.log(body)
           if(userInfo.token){
-            //   console.log(user.token)
               const token = userInfo.token
               dispatch(addDiagnose({body, token}))
-            //   console.log(originalPromiseResult)
+              if(addSuccess){
+                toast.success('Thêm mới thành công!!!', ToastObjects)
+                // dispatch
+              }
           }
         }
       })
+      // const handleChange = (e) => {
+      //   setQuery(e.target.value)
+      //   setSituation(e.target.value)
+      // }
   return (
     <>
         <Toast />
@@ -102,34 +107,35 @@ const AddDiagnoseMain = () => {
                       onChange={formik.handleChange}
                     ></input>
                   </div>
+                  <SunEditor className="mb-4" onChange={handleChangeDesc}  setOptions={{buttonList: buttonList.complex , height: 500}}/>
                   <div className="mb-4">
-                    <label className="form-label">Mô tả</label>
-                    <input
-                      placeholder="Nhập vào đây..."
-                      className="form-control"
-                      rows="4"
-                      name="description"
-                      value={formik.values.description}
-                      // required
-                      onChange={formik.handleChange}
-                    ></input>
-                  </div>
-                  <div className="mb-4">
-                    <input className="form-control mt-3" type="file" name="image" onChange={handleFileInputChange} />
-                  </div>
-                  <div className="mb-4">
-                    <select className="form-control mt-3" name="questionId" value={formik.values.questionId} onChange={formik.handleChange}>
-                      <option value="">Categories</option>
-                      {listQuestion?.length == undefined ? 
+                    <select className="form-control mt-3" name="situationId" value={formik.values.situationId} onChange={formik.handleChange}>
+                      <option value="">situation</option>
+                      {situation?.length == undefined ? 
                         <>
-                          <option value={listQuestion?._id}>{listQuestion?.name}</option>
+                          <option value={situation?._id}>{situation?.name}</option>
                         </>
                         : 
-                        listQuestion?.map(item => (
+                        situation?.map(item => (
                         <option value={item?._id}>{item?.name}</option>
                         )
                         )}
                     </select>
+                  </div>
+                  <div className="mb-4">
+                    <label className="form-label">Đúng</label>
+                    <input
+                      placeholder="Nhập vào đây..."
+                      // className="form-control"
+                      rows="4"
+                      name="isTrue"
+                      value={isTrue}
+                      checked={isTrue}
+                      // required
+                      style={{width: '50px', height: "50px", display: "flex",flexDerection: "column"}}
+                      type="checkbox"
+                      onChange={e => setIsTrue(!isTrue)}
+                    ></input>
                   </div>
                 </div>
               </div>

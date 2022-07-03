@@ -102,8 +102,9 @@ const MainDiagnose = () => {
                 <TableHead>
                   <TableRow>
                     <TableCell>Name</TableCell>
-                    <TableCell align="center">Description</TableCell>
-                    <TableCell align="center">Image</TableCell>
+                    <TableCell align="center">Tên tình huống</TableCell>
+                    <TableCell align="center">Số cách điều trị</TableCell>
+                    <TableCell align="center">Đúng?</TableCell>
                     <TableCell align="center">Created At</TableCell>
                     <TableCell align="center"></TableCell>
                   </TableRow>
@@ -117,10 +118,9 @@ const MainDiagnose = () => {
                       <TableCell component="th" scope="row" align="center">
                         {row.name}
                       </TableCell>
-                      {/* <TableCell align="center"> <img src={row.image} style={{maxWidth: "100px"}}/></TableCell> */}
-                      <TableCell align="center">{row.description}</TableCell>
-                      {/* <TableCell align="center">{row.categories?.name}</TableCell> */}
-                      <TableCell align="center">{row.image}</TableCell>
+                      <TableCell align="center">{row.situationId?.name}</TableCell>
+                      <TableCell align="center">{row.treatment?.length}</TableCell>
+                      {row.isTrue ? <TableCell align="center">Đúng</TableCell> : <TableCell align="center">Sai</TableCell>}
                       <TableCell align="center"> {momment(row.createdAt).format("MMM Do YY")}</TableCell>
                       <TableCell align="center" sx={{ alignItems: 'center', display: "flex",  height: "200px", cursor: "pointer", gap: "0 15px"}}>
                         <div onClick={handleChange} data-id={row._id} className="button-parent"><ion-icon name="hammer-outline"></ion-icon></div>

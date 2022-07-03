@@ -21,13 +21,26 @@ import DiagnoseScreen from "./screens/DiagnoseScreen";
 import TreatmentScreen from "./screens/TreatmentScreen";
 import AddTreatment from "./screens/AddTreatment";
 import TreatmentEditScreen from "./screens/TreatmentEditScreen";
+import DiagnoseEditScreen from "./screens/DiagnoseEditScreen";
 
+// import TypographyOptions from "@mui/material/styles/createTypography"
+// import { TypographyOptions } from '@mui/material/styles/createTypography';
+// import { createThemem, typography } from "@mui/system";
+import { createTheme, ThemeProvider, typography } from "@mui/material";
+export const THEME = createTheme({
+  typography: {
+   "fontFamily": `'Josefin Sans', sans-serif`,
+  //  "fontSize": 14,
+  //  "fontWeightLight": 300,
+  //  "fontWeightRegular": 400,
+  //  "fontWeightMedium": 500
+  } 
+});
 function App() {
   return (
-    <>
+    <ThemeProvider theme={THEME}>
       <Router>
         <Routes>
-          //
           <Route path="/" exact element={<HomeScreen />} />
           <Route path="/qnas" element={<QnAScreen />} />
           <Route path="/add-qna" element={<AddQnA />} />
@@ -39,6 +52,7 @@ function App() {
           <Route path="/treatment" element={<TreatmentScreen />} />
           <Route path="/treatment/:id/edit" element={<TreatmentEditScreen />} />
           <Route path="/diagnose" element={<DiagnoseScreen />} />
+          <Route path="/diagnose/:id/edit" element={<DiagnoseEditScreen />} />
           <Route path="/dpm/:id/edit" element={<DepartEditScreen />} />
           <Route path="/users" element={<UsersScreen />} />
           <Route path="/qna/:id/edit" element={<QnAEditScreen />} />
@@ -46,7 +60,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
-    </>
+    </ThemeProvider>
   );
 }
 

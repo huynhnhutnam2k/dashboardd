@@ -1,6 +1,6 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit'
 import axios from 'axios'
-const URL = "https://serverdhyd.herokuapp.com/api/v1/treatment"
+const URL = "https://sv-dhyd.herokuapp.com/api/treatment"
 
 export const treatmentSlice = createSlice({
     name: "treatment",
@@ -81,7 +81,12 @@ export const fetchTreatment  = createAsyncThunk(
     "treatment/getAll",
     async() => {
         try {
-            const res = await axios.get(`${URL}`)
+            const res = await axios.get(`${URL}`,{
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                }
+            })
             return res?.data
         } catch (error) {
             console.log(error.response.data)
@@ -93,7 +98,13 @@ export const fetchOneTreatment= createAsyncThunk(
     "treatment/getOne",
     async(id) => {
         try {
-            const res = await axios.get(`${URL}/${id}`)
+            const res = await axios.get(`${URL}/${id}`,{
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                }
+            })
+            
             return res?.data
         } catch (error) {
             console.log(error.response.data)
@@ -105,10 +116,13 @@ export const createTreatment = createAsyncThunk(
     "treatment/create",
     async({treatment, token}) => {
         try {
-            const res = await axios.post(`${URL}/add`, treatment,{
+            const res = await axios.post(`${URL}`, treatment,{
                 headers: {
-                    token:`Bearer ${token}`
+                    token:`Bearer ${token}`,
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
                 }
+                
             })
             return res?.data
         } catch (error) {
@@ -121,9 +135,11 @@ export const updateTreatment=  createAsyncThunk(
     "treatment/update",
     async({treatment, id, token}) => {
         try {
-            const res = await axios.put(`${URL}/update/${id}`, treatment, {
+            const res = await axios.put(`${URL}/${id}`, treatment, {
                 headers: {
-                    token: `Bearer ${token}`
+                    token: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
                 }
             })
             return res?.data
@@ -137,9 +153,11 @@ export const deleteTreatment = createAsyncThunk(
     "treatment/delete",
     async({id, token}) => {
         try {
-            const res = await axios.delete(`${URL}/delete/${id}` , {
+            const res = await axios.delete(`${URL}/${id}` , {
                 headers: {
-                    token: `Bearer ${token}`
+                    token: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
                 }
             })
             return res?.data

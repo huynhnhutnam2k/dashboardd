@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice  } from "@reduxjs/toolkit";    
 import axios from "axios";
-const url = "https://serverdhyd.herokuapp.com/api/v1/question"
+const url = "https://sv-dhyd.herokuapp.com/api/situation"
 export const questionSlice = createSlice({
     name:"question",
     initialState:{
@@ -12,20 +12,17 @@ export const questionSlice = createSlice({
         updateSuccess: false,
         deleteSuccess: false,
         addSuccess: false,
-        departmentCd: null,
-        categoriesCd: null,
-        questionCd:null,
     },
     reducers: {
         //get all
         reset: (state) => {
-
+            state.addSuccess = false
+            state.updateSuccess = false
+            state.deleteSuccess = false
+            state.pending = false
+            state.error = false 
         }
     },
-    // extraReducers: builder => {
-    //     builder
-    //         .addCase
-    // }
     extraReducers: builder => {
         builder
             .addCase(getAllQuestion.pending, state => {
@@ -53,21 +50,6 @@ export const questionSlice = createSlice({
             .addCase(deleteQuestion.rejected, state => {
                 state.error = true
                 state.pending = false
-            })
-            .addCase(getACd.pending, state => {
-                state.pending = true
-            })
-            .addCase(getACd.fulfilled, (state, action) => {
-                state.pending = false
-                state.categoriesCd = action.payload.categories
-                state.departmentCd = action.payload.department
-                state.questionCd = action.payload.question
-                state.success = false;
-                state.error = false;
-            })
-            .addCase(getACd.rejected, state => {
-                state.error = true
-                state.pending = true
             })
             .addCase(addQuestion.pending, state => {
                 state.pending = true
@@ -104,18 +86,18 @@ export const questionSlice = createSlice({
                 state.error = true
                 state.pending = false
             })
-            .addCase(getQuestionByDepart.pending , state => {
-                state.pending= true
+            // .addCase(getQuestionByDepart.pending , state => {
+            //     state.pending= true
 
-            })
-            .addCase(getQuestionByDepart.fulfilled, (state, action) => {
-                state.pending = false
-                state.listQuestion = action.payload
-            })
-            .addCase(getQuestionByDepart.rejected, state => {
-                state.error = true
-                state.pending = false
-            })
+            // })
+            // .addCase(getQuestionByDepart.fulfilled, (state, action) => {
+            //     state.pending = false
+            //     state.listQuestion = action.payload
+            // })
+            // .addCase(getQuestionByDepart.rejected, state => {
+            //     state.error = true
+            //     state.pending = false
+            // })
             .addCase(getAQuestion.pending, state =>{
                 state.pending = true
             })
@@ -129,18 +111,16 @@ export const questionSlice = createSlice({
             })
     }
 })
-// export const resetQuestion = () => (dispatch) => {
-//     try {
-        
-//     } catch (error) {
-//         con
-//     }
-// }
 export const getAllQuestion = createAsyncThunk(
     "question/getAll",
     async() => {
         try {
-            const res = await axios.get(`${url}`)
+            const res = await axios.get(`${url}`,{
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                }
+            })
             return res?.data
         } catch (error) {
             console.log(error.response.data)
@@ -151,21 +131,10 @@ export const getAQuestion = createAsyncThunk(
     "question/get", 
     async(id) => {
         try {
-            const res = await axios.get(`${url}/${id}`)
-            return res?.data
-        } catch (error) {
-            console.log(error.response.data)
-        }
-    }
-)
-
-export const getACd = createAsyncThunk(
-    "question/getcd",
-    async(token) => {
-        try {
-            const res = await axios.get(`${url}/getCd`, {
+            const res = await axios.get(`${url}/${id}`,{
                 headers: {
-                    token: `Bearer ${token}`
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
                 }
             })
             return res?.data
@@ -179,9 +148,11 @@ export const updateQuestion = createAsyncThunk(
     "question/update",
     async({body, token, id}) => {
         try {
-            const res = await axios.put(`${url}/update/${id}`, body , {
+            const res = await axios.put(`${url}/${id}`, body , {
                 headers: {
-                    token: `Bearer ${token}`
+                    token: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
                 }
             })
             return res?.data
@@ -194,9 +165,11 @@ export const addQuestion = createAsyncThunk(
     "question/add",
     async({body, token}) => {
         try {
-            const res = await axios.post(`${url}/add`, body , {
+            const res = await axios.post(`${url}`, body , {
                 headers: {
-                    token: `Bearer ${token}`
+                    token: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
                 }
             })
             return res?.data
@@ -210,9 +183,11 @@ export const deleteQuestion = createAsyncThunk(
     "question/delete",
     async({id, token}) => {
         try {
-            const res = await axios.delete(`${url}/delete/${id}`, {
+            const res = await axios.delete(`${url}/${id}`, {
                 headers:{
-                    token: `Bearer ${token}`
+                    token: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
                 }
             })
             if(res){
@@ -234,17 +209,17 @@ export const getQuestionByCate = createAsyncThunk(
         }
     }
 )
-export const getQuestionByDepart = createAsyncThunk(
-    "question/getByDepart",
-    async(id) => {
-        try {
-            const res = await axios.get(`${url}/department/${id}`)
-            return res?.data
-        } catch (error) {
-            console.log(error.response.data)
-        }
-    }
-)
+// export const getQuestionByDepart = createAsyncThunk(
+//     "question/getByDepart",
+//     async(id) => {
+//         try {
+//             const res = await axios.get(`${url}/department/${id}`)
+//             return res?.data
+//         } catch (error) {
+//             console.log(error.response.data)
+//         }
+//     }
+// )
 export const {
     reset
 } = questionSlice.actions

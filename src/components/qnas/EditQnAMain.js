@@ -9,6 +9,8 @@ import * as yup from 'yup'
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import { getACd, getAQuestion, reset, updateQuestion } from "../../redux/questionSlice";
+import SunEditor, {buttonList} from "suneditor-react";
+import { getByRole } from "../../redux/authSlice";
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -19,105 +21,99 @@ const EditProductMain = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const {userInfo} = useSelector(state => state.auth)
-  // const {categoriesCd, departmentCd} = useSelector(state => state.question)
-  // const department = useSelector(state => state.question)
   const { id } = useParams()
-  // const [formData, setFormData] = useState(null)
- 
-    const [file, setFile] = useState('')
-    const handleFileInputChange = (e) => {
-      const file = e.target.files[0];
-      previewFile(file);
-    };
-    const previewFile = (file) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = () => {
-        setFile(reader.result);
-      };
-    };
-  const {question, pending, categoriesCd, departmentCd, updateSuccess} = useSelector(state => state.question)
-  // let init  = ""
+    // const [file, setFile] = useState('')
+    // const handleFileInputChange = (e) => {
+    //   const file = e.target.files[0];
+    //   previewFile(file);
+    // };
+    // const previewFile = (file) => {
+    //   const reader = new FileReader();
+    //   reader.readAsDataURL(file);
+    //   reader.onloadend = () => {
+    //     setFile(reader.result);
+    //   };
+    // };
+  const {question, pending, updateSuccess} = useSelector(state => state.question)
+  const { department } = useSelector(state => state.auth)
+  const [editDesc, setEditDesc] = useState(false)
   useLayoutEffect(()=> {
     dispatch(getAQuestion(id))
-    dispatch(getACd(userInfo.token))
+    dispatch(getByRole(userInfo.token))
     if(updateSuccess){
-      toast.success('Update thành công!!!', ToastObjects)
+      toast.success('Cập nhật tình huống thành công!!!', ToastObjects)
       dispatch(reset())
     }
   },[dispatch,updateSuccess])
-  // console.log(question)
+  const [desc, setDesc] = useState(question?.desc)
   const formik = useFormik({
     initialValues: {
-      name: question?.name,
-      description: question?.description,
-      image: question?.image,
-      answer: question?.answer,
-      department: question?.department,
-      categories: question?.categories
+      desc: question?.desc,
+      name:question?.name,
+      departmentId: question?.departmentId?.name,
     },
     validationSchema: yup.object({
-      description : yup.string().required(),
-      // image: yup.string(),
       name: yup.string().required("required"),
-      answer: yup.string().required("required"),
-      department: yup.string(),
-      categories: yup.string()
+      departmentId: yup.string(),
     }),
     enableReinitialize: true,
     onSubmit: values => {
       const body = {
         name: values.name,
-        description: values.description,
-        image: file,
-        answer: values.answer,
-        department: values.department,
-        categories: values.categories
+        desc: desc,
+        departmentId: values.departmentId,
       }
-      const token = userInfo.token
+      // console.log(body)
+      const token = userInfo?.token
       dispatch(updateQuestion({body,token, id}))
+      
     }
   })
+  const handleChangeDesc = (content) => {
+    setDesc(content)
+  }
   return (
       <>
         <Toast />
         <section className="content-main" style={{ maxWidth: "1200px" }}>
           <form onSubmit={formik.handleSubmit}   >
             <div className="content-header">
-              <Link to="/products" className="btn btn-danger text-white">
-                Go to products
+              <Link to="/qnas" className="btn btn-danger text-white">
+                Trở lại
               </Link>
-              <h2 className="content-title">Update Product</h2>
+              <h2 className="content-title">Cập nhật tình huống</h2>
               <div>
                 <button type="submit" className="btn btn-primary">
-                  Update
+                  Cập nhật
                 </button>
               </div>
             </div>
 
             <div className="row mb-4">
-              <div className="col-xl-8 col-lg-8">
+              <div className="col-xl-12 col-lg-12">
                 <div className="card mb-4 shadow-sm">
                   <div className="card-body">
                   {
                     pending ? <Loading /> :
                     <>
+                    <h6>Mô tả</h6>
                       <div className="mb-4">
-                      <label className="form-label">Description</label>
-                      <textarea
-                        placeholder="Nhập vào đây..."
-                        className="form-control"
-                        rows="4"
-                        name="question.description"
-                        value={formik.values.description}
-                        // required
-                        onChange={formik.handleChange}
-                      ></textarea>
+                      <div
+                          dangerouslySetInnerHTML={{
+                            __html: question?.desc,
+                          }}
+                      />
                     </div>
-                    <div className="mb-4">
+                    <h6>Bạn có muốn sửa mô tả không?</h6>
+                    <div className="button-group">
+                      <div className="button-check" onClick={()=>setEditDesc(false)}>Không</div>
+                      <div className="button-check" onClick={() => setEditDesc(true)}>Có</div>
+                    </div>
+                    { editDesc && <SunEditor className="mb-4" onChange={handleChangeDesc}  setOptions={{buttonList: buttonList.complex , height: 500}}/>}
+                    <div className="mb-4 mt-4">
                       <label className="form-label">Tên</label>
                       <input
-                        placeholder="Nhập vào đây..."
+                        placeholder="Nhập vào đây..." 
                         className="form-control"
                         // rows="4"
                         name="name"
@@ -127,41 +123,16 @@ const EditProductMain = () => {
                       ></input>
                     </div>
                     <div className="mb-4">
-                      <label className="form-label">Câu trả lời</label>
-                      <textarea
-                        placeholder="Nhập vào đây..."
-                        className="form-control"
-                        rows="4"
-                        name="answer"
-                        value={formik.values.answer}
-                        // required
-                        onChange={formik.handleChange}
-                      ></textarea>
+                      <label className="form-label">Thuộc khoa</label>
+                      <select className="form-control " name="departmentId" value={formik.values.departmentId} onChange={formik.handleChange}>
+                        <option value={question?.departmentId?._id}>{question?.departmentId?.name}</option>
+                        { department?.map(item => (
+                            item?._id !== question?.departmentId?._id && <option value={item._id}>{item.name}</option>
+                          
+                        ))}
+                      </select>
                     </div>
-                    <div className="mb-4">
-                      <select className="form-control mt-3" name="categories" value={formik.values.categories} onChange={formik.handleChange}>
-                        {/* <option value="">Categories</option> */}
-                        {categoriesCd?.length === undefined ? <>
                 
-                          <option value={categoriesCd?._id}>{categoriesCd?.name}</option>
-                          </>: categoriesCd?.map(item => (
-                          <option value={item?._id} key={item._id}>{item?.name}</option>
-
-                        ))}
-                      </select>
-                    </div>
-                    <div className="mb-4">
-                      <select className="form-control mt-3" name="department" value={formik.values.department} onChange={formik.handleChange}>
-                        {/* <option value="">Department</option> */}
-                        { departmentCd?.map(item => (
-
-                          <option key={item._id} value={item._id}>{item.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="mb-4">
-                      <input className="form-control mt-3" type="file" name="image" onChange={handleFileInputChange} />
-                    </div>
                     </>
                   }
                   </div>

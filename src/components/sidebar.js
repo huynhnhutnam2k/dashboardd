@@ -44,17 +44,6 @@ const Sidebar = () => {
                 <span className="text">Danh sách câu hỏi</span>
               </NavLink>
             </li>
-            {/* <li className="menu-item">
-              <NavLink
-                activeClassName="active"
-                className="menu-link"
-                to="/add-qna"
-              >
-                <i class="icon fas fa-plus "></i>
-                <span className="text">Thêm câu hỏi</span>
-              </NavLink>
-            </li> */}
-
             <li className="menu-item">
               <NavLink
                 activeClassName="active"

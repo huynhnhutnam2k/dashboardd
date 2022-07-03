@@ -8,7 +8,7 @@ import Toast from "../LoadingError/Toast";
 import * as yup from 'yup'
 import { useFormik } from 'formik'
 import {useDispatch, useSelector} from 'react-redux'
-import { addUser } from "../../redux/authSlice";
+import { addUser, getByRole } from "../../redux/authSlice";
 import { getACd } from "../../redux/questionSlice";
 const ToastObjects = {
   pauseOnFocusLoss: false,
@@ -17,12 +17,12 @@ const ToastObjects = {
   autoClose: 2000,
 };
 const AddUserMain = () => {
-  const {userInfo, addUserSuccess} = useSelector(state => state.auth)
+  const {userInfo, addUserSuccess, department} = useSelector(state => state.auth)
   const { categoriesCd } = useSelector(state => state.question)
   const dispatch = useDispatch()
   const navigate = useNavigate()
   useEffect(() => {
-    dispatch(getACd(userInfo.token))
+    dispatch(getByRole(userInfo.token))
     if(addUserSuccess){
       toast.success('Thêm mới thành công!!!', ToastObjects)
     }
@@ -59,7 +59,6 @@ const AddUserMain = () => {
       resetForm()
     }
   })
-  // console.log(formik.errors)
   return (
     <>
       <Toast />
@@ -120,12 +119,12 @@ const AddUserMain = () => {
                   <div className="mb-4">
                     <select className="form-control mt-3" name="role" value={formik.values.role} onChange={formik.handleChange}>
                       <option value="">Role</option>
-                      {categoriesCd?.length == undefined ? 
+                      {department?.length == undefined ? 
                         <>
-                          <option value={categoriesCd?.name}>{categoriesCd?.name}</option>
+                          <option value={department?.name}>{department?.name}</option>
                         </>
                         : 
-                        categoriesCd?.map(item => (
+                        department?.map(item => (
                         <option value={item?.name}>{item?.name}</option>
                         )
                         )}

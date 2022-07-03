@@ -16,6 +16,9 @@ import Stack from '@mui/material/Stack';
 import momment from 'moment'
 import Loading from "../LoadingError/Loading";
 import { allDepartment, deleteDepart, departFetch } from "../../redux/departmentSlice";
+import { reset } from "../../redux/questionSlice";
+import { toast } from "react-toastify";
+import Toast from "../LoadingError/Toast";
 const style = {
   position: 'absolute',
   top: '50%',
@@ -27,7 +30,12 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-
+const ToastObjects = {
+  pauseOnFocusLoss: false,
+  draggable: false,
+  pauseOnHouver: false,
+  autoClose: 2000,
+};
 const MainDepartment = () => {
     const dispatch = useDispatch()
   const [open, setOpen] = useState(false);
@@ -37,17 +45,21 @@ const MainDepartment = () => {
   const navigate = useNavigate()
   const [idDepart, setIdDepart] = useState('')
   const {pending, listDepartment, deleteSuccess} = useSelector(state => state.department)
-  // console.log(pending)
-  useLayoutEffect(() => {
+  useEffect(() => {
     dispatch(departFetch())
-  },[dispatch, listDepartment.length, deleteSuccess])
+    if(deleteSuccess){
+      toast.success('Xóa thành công!!!', ToastObjects)
+      dispatch(reset())
+    }
+  },[dispatch, deleteSuccess])
+  // console.log(deleteSuccess)
   const handleChange = (e) => {
     navigate(`/dpm/${e.target.dataset.id}/edit`)
   }
   const handleConfirm = () => {
     const token  = userInfo?.token
-    dispatch(deleteDepart({idDepart, token}))
     setOpen(false)
+    dispatch(deleteDepart({idDepart, token}))
   }
   const handleDelete = (e) => {
     setOpen(true)
@@ -55,6 +67,7 @@ const MainDepartment = () => {
   }
   return (
     <>
+      <Toast />
       <section className="content-main">
         <div className="content-header">
           <h2 className="content-title">Danh sách chuyên khoa</h2>
@@ -92,17 +105,14 @@ const MainDepartment = () => {
               </div>
             </div>
           </header>
-
           <div className="card-body">
             {pending ? <Loading /> : <>
-
                 <TableContainer component={Paper}>
               <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Name</TableCell>
+                    <TableCell align="center">Tên</TableCell>
                     <TableCell align="center">Số lượng câu hỏi</TableCell>
-                    <TableCell align="center">Dean name</TableCell>
                     <TableCell align="center">Created At</TableCell>
                     <TableCell align="center"></TableCell>
                   </TableRow>
@@ -116,10 +126,7 @@ const MainDepartment = () => {
                       <TableCell component="th" scope="row" align="center">
                         {row.name}
                       </TableCell>
-                      {/* <TableCell align="center"> <img src={row.image} style={{maxWidth: "100px"}}/></TableCell> */}
-                      <TableCell align="center">{row.question.length}</TableCell>
-                      {/* <TableCell align="center">{row.categories?.name}</TableCell> */}
-                      <TableCell align="center">{row.deanName}</TableCell>
+                      <TableCell align="center">{row.situation?.length}</TableCell>
                       <TableCell align="center"> {momment(row.createdAt).format("MMM Do YY")}</TableCell>
                       <TableCell align="center" sx={{ alignItems: 'center', display: "flex",  height: "200px", cursor: "pointer", gap: "0 15px"}}>
                         <div onClick={handleChange} data-id={row._id} className="button-parent"><ion-icon name="hammer-outline"></ion-icon></div>
