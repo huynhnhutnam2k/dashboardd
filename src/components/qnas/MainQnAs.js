@@ -62,7 +62,7 @@ const MainQnAs = () => {
       toast.success("Xóa tình huống thành công", ToastObjects);
       dispatch(reset());
     }
-  }, [dispatch, listQuestion.length, deleteSuccess]);
+  }, [dispatch, listQuestion?.length, deleteSuccess]);
   const handleChange = (e) => {
     navigate(`/qna/${e.target.dataset.id}/edit`);
   };

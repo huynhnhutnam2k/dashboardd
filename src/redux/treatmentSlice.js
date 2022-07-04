@@ -83,6 +83,9 @@ export const fetchTreatment = createAsyncThunk("treatment/getAll", async () => {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers":
+          "origin, x-requested-with, content-type",
+        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
       },
     });
     return res?.data;
@@ -99,6 +102,9 @@ export const fetchOneTreatment = createAsyncThunk(
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers":
+            "origin, x-requested-with, content-type",
+          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
         },
       });
 
@@ -118,6 +124,9 @@ export const createTreatment = createAsyncThunk(
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers":
+            "origin, x-requested-with, content-type",
+          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
         },
       });
       return res?.data;
@@ -136,6 +145,9 @@ export const updateTreatment = createAsyncThunk(
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers":
+            "origin, x-requested-with, content-type",
+          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
         },
       });
       return res?.data;
@@ -154,6 +166,9 @@ export const deleteTreatment = createAsyncThunk(
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers":
+            "origin, x-requested-with, content-type",
+          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
         },
       });
       return res?.data;

@@ -158,6 +158,9 @@ export const addUser = createAsyncThunk(
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers":
+            "origin, x-requested-with, content-type",
+          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
         },
       });
       return res?.data;
@@ -174,6 +177,9 @@ export const getAllUser = createAsyncThunk("auth/getAll", async (token) => {
         Vary: "Origin",
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers":
+          "origin, x-requested-with, content-type",
+        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
       },
     });
     return data;
@@ -189,6 +195,9 @@ export const logOut = createAsyncThunk("auth/logOut", async ({ token, id }) => {
         token: `Bearer ${token}`,
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers":
+          "origin, x-requested-with, content-type",
+        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
       },
     });
     return res.data;
@@ -204,6 +213,9 @@ export const getByRole = createAsyncThunk("auth/getByRole", async (token) => {
         Vary: "Origin",
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers":
+          "origin, x-requested-with, content-type",
+        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
       },
     });
     return res?.data;
