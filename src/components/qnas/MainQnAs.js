@@ -16,8 +16,11 @@ import Stack from "@mui/material/Stack";
 import momment from "moment";
 import Loading from "../LoadingError/Loading";
 import {
+  decrement,
   deleteQuestion,
   getAllQuestion,
+  getPage,
+  increment,
   reset,
 } from "../../redux/questionSlice";
 import { getByRole } from "../../redux/authSlice";
@@ -48,9 +51,8 @@ const MainQnAs = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const { listQuestion, pending, error, deleteSuccess } = useSelector(
-    (state) => state.question
-  );
+  const { listQuestion, pending, error, deleteSuccess, page, maxPage } =
+    useSelector((state) => state.question);
   const { situation } = useSelector((state) => state.auth);
   const { userInfo } = useSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -62,7 +64,9 @@ const MainQnAs = () => {
       toast.success("Xóa tình huống thành công", ToastObjects);
       dispatch(reset());
     }
-  }, [dispatch, listQuestion?.length, deleteSuccess]);
+  }, [dispatch, listQuestion?.length, deleteSuccess, page]);
+  console.log(maxPage);
+  // console.log(situation);
   const handleChange = (e) => {
     navigate(`/qna/${e.target.dataset.id}/edit`);
   };
@@ -76,6 +80,7 @@ const MainQnAs = () => {
     setOpen(true);
     setIdQuestion(e.target.dataset.id);
   };
+  // console.log(page);
   return (
     <>
       <Toast />
@@ -187,6 +192,35 @@ const MainQnAs = () => {
                 </TableContainer>
               </>
             )}
+            <nav className="float-end mt-4" aria-label="Page navigation">
+              <ul className="pagination">
+                <li className={`page-item ${page == 1 ? "disabled" : ""} `}>
+                  <Link
+                    className="page-link"
+                    to="#"
+                    onClick={() => dispatch(decrement())}
+                  >
+                    Previous
+                  </Link>
+                </li>
+                <li className="page-item active">
+                  <Link className="page-link" to="#">
+                    {page}
+                  </Link>
+                </li>
+                <li
+                  className={`page-item ${page >= maxPage ? "disabled" : ""} `}
+                >
+                  <Link
+                    className="page-link"
+                    to="#"
+                    onClick={() => dispatch(increment())}
+                  >
+                    Next
+                  </Link>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
         <Modal

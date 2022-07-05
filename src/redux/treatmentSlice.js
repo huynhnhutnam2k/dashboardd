@@ -13,6 +13,16 @@ export const treatmentSlice = createSlice({
     addSuccess: false,
     updateSuccess: false,
     deleteSuccess: false,
+    page: 1,
+    maxPage: 1,
+  },
+  reducers: {
+    incrementTreatment: (state) => {
+      state.page += 1;
+    },
+    decrementTreatment: (state) => {
+      state.page -= 1;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -20,7 +30,8 @@ export const treatmentSlice = createSlice({
         state.pending = true;
       })
       .addCase(fetchTreatment.fulfilled, (state, action) => {
-        state.listTreatment = action.payload;
+        state.listTreatment = action.payload.treatment;
+        state.maxPage = action.payload.maxPage;
         state.pending = false;
       })
       .addCase(fetchTreatment.rejected, (state) => {
@@ -77,22 +88,28 @@ export const treatmentSlice = createSlice({
   },
 });
 
-export const fetchTreatment = createAsyncThunk("treatment/getAll", async () => {
-  try {
-    const res = await axios.get(`${URL}`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers":
-          "origin, x-requested-with, content-type",
-        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
-      },
-    });
-    return res?.data;
-  } catch (error) {
-    console.log(error.response.data);
+export const fetchTreatment = createAsyncThunk(
+  "treatment/getAll",
+  async (arg, { getState }) => {
+    try {
+      const {
+        treatment: { page },
+      } = getState();
+      const res = await axios.get(`${URL}?page=${page}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers":
+            "origin, x-requested-with, content-type",
+          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
+        },
+      });
+      return res?.data;
+    } catch (error) {
+      console.log(error.response.data);
+    }
   }
-});
+);
 
 export const fetchOneTreatment = createAsyncThunk(
   "treatment/getOne",
@@ -177,5 +194,6 @@ export const deleteTreatment = createAsyncThunk(
     }
   }
 );
-
+export const { incrementTreatment, decrementTreatment } =
+  treatmentSlice.actions;
 export default treatmentSlice.reducer;

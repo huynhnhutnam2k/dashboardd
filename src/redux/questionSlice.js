@@ -12,6 +12,8 @@ export const questionSlice = createSlice({
     updateSuccess: false,
     deleteSuccess: false,
     addSuccess: false,
+    page: 1,
+    maxPage: 1,
   },
   reducers: {
     //get all
@@ -22,6 +24,12 @@ export const questionSlice = createSlice({
       state.pending = false;
       state.error = false;
     },
+    increment: (state) => {
+      state.page += 1;
+    },
+    decrement: (state) => {
+      state.page -= 1;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -29,7 +37,8 @@ export const questionSlice = createSlice({
         state.pending = true;
       })
       .addCase(getAllQuestion.fulfilled, (state, action) => {
-        state.listQuestion = action.payload;
+        state.listQuestion = action.payload.situation;
+        state.maxPage = action.payload.maxPage;
         state.pending = false;
         state.success = false;
         state.error = false;
@@ -110,22 +119,29 @@ export const questionSlice = createSlice({
       });
   },
 });
-export const getAllQuestion = createAsyncThunk("question/getAll", async () => {
-  try {
-    const res = await axios.get(`${url}`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers":
-          "origin, x-requested-with, content-type",
-        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
-      },
-    });
-    return res?.data;
-  } catch (error) {
-    console.log(error.response.data);
+export const getPage = (state) => state.question.page;
+export const getAllQuestion = createAsyncThunk(
+  "question/getAll",
+  async (page = 1, { getState }) => {
+    try {
+      const {
+        question: { page },
+      } = getState();
+      const res = await axios.get(`${url}/page/${page}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers":
+            "origin, x-requested-with, content-type",
+          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
+        },
+      });
+      return res?.data;
+    } catch (error) {
+      console.log(error.response.data);
+    }
   }
-});
+);
 export const getAQuestion = createAsyncThunk("question/get", async (id) => {
   try {
     const res = await axios.get(`${url}/${id}`, {
@@ -228,5 +244,5 @@ export const getQuestionByCate = createAsyncThunk(
 //         }
 //     }
 // )
-export const { reset } = questionSlice.actions;
+export const { reset, increment, decrement } = questionSlice.actions;
 export default questionSlice.reducer;

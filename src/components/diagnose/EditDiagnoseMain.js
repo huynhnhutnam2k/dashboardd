@@ -147,7 +147,7 @@ const EditDiagnoseMain = () => {
                           setOptions={{
                             buttonList: buttonList.complex,
                             height: 500,
-                            value: diagnose?.desc,
+                            value: formik.values.desc,
                             font: ["Josefin Sans"],
                           }}
                         />

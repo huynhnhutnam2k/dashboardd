@@ -3,18 +3,18 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import * as yup  from 'yup'
+import * as yup from "yup";
 import Message from "../LoadingError/Error";
 import Loading from "../LoadingError/Loading";
 import Toast from "../LoadingError/Toast";
-import { useNavigate} from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 import { addDepart } from "../../redux/departmentSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { getACd, getAllQuestion, reset } from "../../redux/questionSlice";
 import { addDiagnose } from "../../redux/diagnoseSlice";
 import { getByRole } from "../../redux/authSlice";
-import SunEditor, { buttonList } from 'suneditor-react';
-import 'suneditor/dist/css/suneditor.min.css';
+import SunEditor, { buttonList } from "suneditor-react";
+import "suneditor/dist/css/suneditor.min.css";
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -22,63 +22,70 @@ const ToastObjects = {
   autoClose: 2000,
 };
 const AddDiagnoseMain = () => {
-
-    const {userInfo,situation} = useSelector(state => state.auth) 
-    const  { addSuccess, error} = useSelector(state =>  state.diagnose)
-    const navigate = useNavigate()
-    const dispatch = useDispatch()
-    useEffect(() => {
-        dispatch(getByRole(userInfo?.token))
-        if(addSuccess){
-          toast.success("Them thannh cong", ToastObjects)
-          dispatch(reset())
-        }
-        if(error){
-          toast.error("Them that bai", ToastObjects)
-          dispatch(reset())
-        }
-    },[dispatch, addSuccess, error])
-    const [file, setFile] = useState('')
-    const [isTrue, setIsTrue] = useState("")
-
-    const [desc, setDesc ] = useState(null)
-    const handleChangeDesc = (content) => {
-      setDesc(content)
+  const { userInfo, situation } = useSelector((state) => state.auth);
+  const { addSuccess, error } = useSelector((state) => state.diagnose);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getByRole(userInfo?.token));
+    if (addSuccess) {
+      toast.success("Them thannh cong", ToastObjects);
+      dispatch(reset());
     }
-    const formik = useFormik({
-        initialValues: {
-          name: "",
-          desc: "",
-          situationId: "",
-          isTrue: isTrue
-        },
-        onSubmit: (values) => {
-          const body = {
-            name: values.name,
-            desc: desc,
-            situationId: values.situationId,
-            isTrue: isTrue
-          }
-          // console.log(body)
-          if(userInfo.token){
-              const token = userInfo.token
-              dispatch(addDiagnose({body, token}))
-              if(addSuccess){
-                toast.success('Thêm mới thành công!!!', ToastObjects)
-                // dispatch
-              }
-          }
+    if (error) {
+      toast.error("Them that bai", ToastObjects);
+      dispatch(reset());
+    }
+  }, [dispatch, addSuccess, error]);
+  const [file, setFile] = useState("");
+  const [isTrue, setIsTrue] = useState("");
+
+  const [desc, setDesc] = useState(null);
+  const handleChangeDesc = (content) => {
+    setDesc(content);
+  };
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      desc: "",
+      situationId: "",
+      isTrue: isTrue,
+    },
+
+    onSubmit: (values) => {
+      const body = {
+        name: values.name,
+        desc: desc,
+        situationId: values.situationId,
+        isTrue: isTrue,
+      };
+      // console.log(body)
+      if (userInfo.token) {
+        const token = userInfo.token;
+        // console.log(body);
+        dispatch(addDiagnose({ body, token }));
+        if (addSuccess) {
+          toast.success("Thêm mới thành công!!!", ToastObjects);
+          // dispatch
         }
-      })
-      // const handleChange = (e) => {
-      //   setQuery(e.target.value)
-      //   setSituation(e.target.value)
-      // }
+      }
+    },
+    // disabled: !formik.dirty,
+  });
+  // const handleChange = (e) => {
+  //   setQuery(e.target.value)
+  //   setSituation(e.target.value)
+  // }
+  // console.log(formik.dirty);
   return (
     <>
-        <Toast />
+      <Toast />
       <section className="content-main" style={{ maxWidth: "1200px" }}>
-        <form onSubmit={formik.handleSubmit}  encType="multipart/form-data">
+        <form
+          onSubmit={formik.handleSubmit}
+          encType="multipart/form-data"
+          disabled={!formik.dirty}
+        >
           <div className="content-header">
             <Link to="/department" className="btn btn-danger text-white">
               Trở về
@@ -107,19 +114,30 @@ const AddDiagnoseMain = () => {
                       onChange={formik.handleChange}
                     ></input>
                   </div>
-                  <SunEditor className="mb-4" onChange={handleChangeDesc}  setOptions={{buttonList: buttonList.complex , height: 500}}/>
+                  <SunEditor
+                    className="mb-4"
+                    onChange={handleChangeDesc}
+                    setOptions={{ buttonList: buttonList.complex, height: 500 }}
+                  />
                   <div className="mb-4">
-                    <select className="form-control mt-3" name="situationId" value={formik.values.situationId} onChange={formik.handleChange}>
+                    <select
+                      className="form-control mt-3"
+                      name="situationId"
+                      value={formik.values.situationId}
+                      onChange={formik.handleChange}
+                    >
                       <option value="">situation</option>
-                      {situation?.length == undefined ? 
+                      {situation?.length == undefined ? (
                         <>
-                          <option value={situation?._id}>{situation?.name}</option>
+                          <option value={situation?._id}>
+                            {situation?.name}
+                          </option>
                         </>
-                        : 
-                        situation?.map(item => (
-                        <option value={item?._id}>{item?.name}</option>
-                        )
-                        )}
+                      ) : (
+                        situation?.map((item) => (
+                          <option value={item?._id}>{item?.name}</option>
+                        ))
+                      )}
                     </select>
                   </div>
                   <div className="mb-4">
@@ -132,9 +150,14 @@ const AddDiagnoseMain = () => {
                       value={isTrue}
                       checked={isTrue}
                       // required
-                      style={{width: '50px', height: "50px", display: "flex",flexDerection: "column"}}
+                      style={{
+                        width: "50px",
+                        height: "50px",
+                        display: "flex",
+                        flexDerection: "column",
+                      }}
                       type="checkbox"
-                      onChange={e => setIsTrue(!isTrue)}
+                      onChange={(e) => setIsTrue(!isTrue)}
                     ></input>
                   </div>
                 </div>
@@ -144,7 +167,7 @@ const AddDiagnoseMain = () => {
         </form>
       </section>
     </>
-  )
-}
+  );
+};
 
-export default AddDiagnoseMain
+export default AddDiagnoseMain;

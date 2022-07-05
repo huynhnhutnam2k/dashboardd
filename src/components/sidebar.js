@@ -1,6 +1,5 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
-
 const Sidebar = () => {
   return (
     <div>
@@ -40,7 +39,8 @@ const Sidebar = () => {
                 className="menu-link"
                 to="/qnas"
               >
-                <i className="icon fas fa-shopping-bag"></i>
+                {/* <i className="icon fas fa-shopping-bag"></i> */}
+                <i class="icon fal fa-question"></i>
                 <span className="text">Danh sách câu hỏi</span>
               </NavLink>
             </li>
@@ -60,7 +60,7 @@ const Sidebar = () => {
                 className="menu-link"
                 to="/department"
               >
-                <i className="icon fas fa-user"></i>
+                <i class="icon fad fa-folder-tree"></i>
                 <span className="text">Chuyên khoa</span>
               </NavLink>
             </li>
@@ -70,7 +70,11 @@ const Sidebar = () => {
                 className="menu-link"
                 to="/diagnose"
               >
-                <i className="icon fas fa-user"></i>
+                {/* <i className="icon fas fa-user"></i> */}
+                {/* <i class="icon fa-solid fa-stethoscope"></i>
+                 */}
+                {/* <i class="fa-solid fa-stethoscope"></i> */}
+                <i class="icon fal fa-stethoscope"></i>
                 <span className="text">Chẩn đoán</span>
               </NavLink>
             </li>
@@ -80,7 +84,7 @@ const Sidebar = () => {
                 className="menu-link"
                 to="/treatment"
               >
-                <i className="icon fas fa-user"></i>
+                <i class="icon far fa-user-md-chat"></i>
                 <span className="text">Điều trị</span>
               </NavLink>
             </li>

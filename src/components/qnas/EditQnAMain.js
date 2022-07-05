@@ -149,6 +149,7 @@ const EditProductMain = () => {
                           setOptions={{
                             buttonList: buttonList.complex,
                             height: 500,
+                            value: formik.values.desc,
                           }}
                         />
                       )}

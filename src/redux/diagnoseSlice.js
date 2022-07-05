@@ -1,22 +1,29 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 const url = `https://sv-dhyd.herokuapp.com/api`;
-export const getAllDiag = createAsyncThunk("diagnose/getAll", async () => {
-  try {
-    const res = await axios.get(`${url}/diagnose`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers":
-          "origin, x-requested-with, content-type",
-        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
-      },
-    });
-    return res.data;
-  } catch (error) {
-    console.log(error.response.data);
+export const getAllDiag = createAsyncThunk(
+  "diagnose/getAll",
+  async (page, { getState }) => {
+    try {
+      const {
+        diagnose: { page },
+      } = getState();
+      console.log(page);
+      const res = await axios.get(`${url}/diagnose?page=${page}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers":
+            "origin, x-requested-with, content-type",
+          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
+        },
+      });
+      return res.data;
+    } catch (error) {
+      console.log(error.response.data);
+    }
   }
-});
+);
 
 export const getADiag = createAsyncThunk("diagnose/getOne", async (id) => {
   try {
@@ -146,15 +153,25 @@ export const diagnoseSlice = createSlice({
     addSuccess: false,
     updateSuccess: false,
     deleteSuccess: false,
+    page: 1,
+    maxPage: 1,
   },
-  reducers: {},
+  reducers: {
+    incrementDiagnose: (state) => {
+      state.page += 1;
+    },
+    decrementDiagnose: (state) => {
+      state.page -= 1;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getAllDiag.pending, (state) => {
         state.pending = true;
       })
       .addCase(getAllDiag.fulfilled, (state, action) => {
-        state.listDiagnose = action.payload;
+        state.listDiagnose = action.payload.diagnose;
+        state.maxPage = action.payload.maxPage;
         state.pending = false;
       })
       .addCase(getAllDiag.rejected, (state) => {
@@ -231,4 +248,5 @@ export const diagnoseSlice = createSlice({
   },
 });
 
+export const { incrementDiagnose, decrementDiagnose } = diagnoseSlice.actions;
 export default diagnoseSlice.reducer;

@@ -114,13 +114,14 @@ const EditTreatmentMain = () => {
                     <>
                       <div className="mb-4">
                         <label className="form-label">Tên</label>
-                        <input
+                        <textarea
                           placeholder="Nhập vào đây..."
                           className="form-control"
                           name="name"
+                          style={{ width: "100%" }}
                           value={formik.values.name}
                           onChange={formik.handleChange}
-                        ></input>
+                        ></textarea>
                       </div>
                       <div className="mb-4">
                         <label className="form-label">Mô tả</label>
