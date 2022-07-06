@@ -12,6 +12,10 @@ import { addQuestion, reset } from "../../redux/questionSlice";
 import { getByRole } from "../../redux/authSlice";
 import SunEditor, { buttonList } from "suneditor-react";
 import "suneditor/dist/css/suneditor.min.css";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebase";
+
+
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -20,7 +24,7 @@ const ToastObjects = {
 };
 const AddQnAMain = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
-  const departmentCd = useSelector((state) => state.auth.department);
+  const { listDepartment:departmentCd } = useSelector((state) => state.department);
   const { pending, addSuccess } = useSelector((state) => state.question);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -64,25 +68,55 @@ const AddQnAMain = () => {
       }
     },
   });
-  // function onImageUploadBefore(files, info, core, uploadHandler) {
-  //   // Upload image to Server
 
-  //   const src = UploadToServer(files[0]);
+  ////
 
-  //   // result
-  //   const response = {
-  //     // The response must have a "result" array.
-  //     result: [
-  //       {
-  //         url: src,
-  //         name: files[0].name,
-  //         size: files[0].size,
-  //       },
-  //     ],
-  //   };
-  //   console.log(response);
-  //   // uploadHandler(response);
-  // }
+  const handleImageUploadBefore = (files, info, uploadHandler) => {
+    /** @type {any} */
+    const metadata = {
+      contentType: 'image/jpeg'
+    };  
+    const storageRef = ref(storage, 'images/' + files[0].name);
+    const uploadTask = uploadBytesResumable(storageRef, files[0], metadata);  
+    uploadTask.on('state_changed',
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Upload is ' + progress + '% done');
+        switch (snapshot.state) {
+          case 'paused':
+            console.log('Upload is paused');
+            break;
+          case 'running':
+            console.log('Upload is running');
+            break;
+        }
+      }, 
+      (error) => {
+        switch (error.code) {
+          case 'storage/unauthorized':
+            break;
+            break;
+          case 'storage/unknown':
+            break;
+        }
+      }, 
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {        
+                const response = {
+                  result: [
+                    {
+                      url: downloadURL,
+                      name: files[0].name,
+                      size: files[0].size,
+                    },
+                  ],
+                }
+                uploadHandler(response)        
+        });
+      }
+    );  
+  }
+
 
   return (
     <>
@@ -112,8 +146,8 @@ const AddQnAMain = () => {
                   <SunEditor
                     className="mb-4"
                     onChange={handleChangeDesc}
+                    onImageUploadBefore={handleImageUploadBefore}
                     setOptions={{ buttonList: buttonList.complex, height: 500 }}
-                    // onImageUploadBefore={onImageUploadBefore}
                   />
                   <div className="mb-4">
                     <label className="form-label">Tên</label>
@@ -133,6 +167,7 @@ const AddQnAMain = () => {
                       onChange={formik.handleChange}
                     >
                       <option value="">Department</option>
+                      
                       {departmentCd?.length === undefined ? (
                         <option
                           key={departmentCd?._id}

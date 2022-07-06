@@ -7,6 +7,7 @@ const URL = "https://sv-dhyd.herokuapp.com/api";
 export const userLocalStorage = JSON.parse(localStorage.getItem("user"))
   ? JSON.parse(localStorage.getItem("user"))
   : null;
+console.log(userLocalStorage)
 export const authSlice = createSlice({
   name: "auth",
   initialState: {
@@ -139,7 +140,15 @@ export const authSlice = createSlice({
 
 export const logIn = createAsyncThunk("auth/login", async ({ user }) => {
   try {
-    const res = await axios.post(`${URL}/user/login`, user);
+    const res = await axios.post(`${URL}/user/login`, user, {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers":
+          "origin, x-requested-with, content-type",
+        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
+      },
+    });
     if (res) {
       localStorage.setItem("user", JSON.stringify(res.data));
       document.location.href = "/";

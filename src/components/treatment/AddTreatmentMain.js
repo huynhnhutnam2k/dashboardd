@@ -11,6 +11,8 @@ import { useNavigate } from "react-router-dom";
 import { addDepart } from "../../redux/departmentSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { getACd, getAllQuestion, reset } from "../../redux/questionSlice";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebase";
 import {
   addDiagnose,
   getDiagByQuestion,
@@ -78,6 +80,54 @@ const AddTreatmentMain = () => {
     setQuery(e.target.value);
     setSituation(e.target.value);
   };
+
+////
+const handleImageUploadBefore = (files, info, uploadHandler) => {
+  /** @type {any} */
+  const metadata = {
+    contentType: 'image/jpeg'
+  };  
+  const storageRef = ref(storage, 'images/' + files[0].name);
+  const uploadTask = uploadBytesResumable(storageRef, files[0], metadata);  
+  uploadTask.on('state_changed',
+    (snapshot) => {
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      console.log('Upload is ' + progress + '% done');
+      switch (snapshot.state) {
+        case 'paused':
+          console.log('Upload is paused');
+          break;
+        case 'running':
+          console.log('Upload is running');
+          break;
+      }
+    }, 
+    (error) => {
+      switch (error.code) {
+        case 'storage/unauthorized':
+          break;
+          break;
+        case 'storage/unknown':
+          break;
+      }
+    }, 
+    () => {
+      getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {        
+              const response = {
+                result: [
+                  {
+                    url: downloadURL,
+                    name: files[0].name,
+                    size: files[0].size,
+                  },
+                ],
+              }
+              uploadHandler(response)        
+      });
+    }
+  );  
+}
+
   return (
     <>
       <Toast />
@@ -121,6 +171,7 @@ const AddTreatmentMain = () => {
                   <SunEditor
                     className="mb-4 "
                     onChange={handleChangeDesc}
+                    onImageUploadBefore={handleImageUploadBefore}
                     setOptions={{ buttonList: buttonList.complex, height: 500 }}
                   />
                   <h6 className="mt-4">Kết quả điều trị</h6>
@@ -182,14 +233,14 @@ const AddTreatmentMain = () => {
                       onChange={(e) => setDiagnose(e.target.value)}
                     >
                       <option value="">Chẩn đoán</option>
-                      {listDiagnose?.length == undefined ? (
+                      {listDiagnose.diagnose?.length == undefined ? (
                         <>
                           <option value={listDiagnose?._id}>
                             {listDiagnose?.name}
                           </option>
                         </>
                       ) : (
-                        listDiagnose?.map((item) => (
+                        listDiagnose.diagnose?.map((item) => (
                           <option value={item?._id} key={item._id}>
                             {item?.name}
                           </option>
