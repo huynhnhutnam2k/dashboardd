@@ -61,11 +61,10 @@ const AddQnAMain = () => {
         departmentId: values.departmentId,
       };
       const token = userInfo?.token;
-      //dispatch(addQuestion({ body, token }));
-      // console.log(body);
+      dispatch(addQuestion({ body, token }));
       if (addSuccess) {
         toast.success("Thêm mới tình huống thành công!!!", ToastObjects);
-        // dispatch
+      
       }
     },
   });

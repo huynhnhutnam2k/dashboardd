@@ -7,7 +7,7 @@ import Loading from "../LoadingError/Loading";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
-import { getDiagByQuestion } from "../../redux/diagnoseSlice";
+import { getAllDiag, getDiagByQuestion } from "../../redux/diagnoseSlice";
 import { getACd, reset } from "../../redux/questionSlice";
 import { fetchOneTreatment, updateTreatment } from "../../redux/treatmentSlice";
 import { getByRole } from "../../redux/authSlice";
@@ -37,6 +37,7 @@ const EditTreatmentMain = () => {
     dispatch(getByRole(token));
     dispatch(fetchOneTreatment(id));
     dispatch(getDiagByQuestion(query));
+    dispatch(getAllDiag());
     if (updateSuccess) {
       toast.success("Cập nhật tình huống thành công!!!", ToastObjects);
       dispatch(reset());
@@ -265,13 +266,15 @@ const EditTreatmentMain = () => {
                         </select>
                       </div>
                       <div className="mb-4">
+                        {console.log(treatment?.diagnose?._id)}
                         <select
                           className="form-control mt-3"
                           name="diagnose"
                           value={formik.values.diagnose}
                           onChange={formik.handleChange}
+                          defaultValue={treatment?.diagnose._id}
                         >
-                          {listDiagnose?.map((item) =>
+                          {listDiagnose?.diagnose?.map((item) =>
                             item._id !== treatment?.diagnose?._id ? (
                               <option value={item?._id}>{item?.name}</option>
                             ) : null
