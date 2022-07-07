@@ -43,7 +43,7 @@ const MainDiagnose = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const { pending, listDiagnose, deleteSuccess, page, maxPage } = useSelector(
     (state) => state.diagnose
-  );
+  );  
   const [idDiagnose, setIdDiagnose] = useState("");
   const navigate = useNavigate();
   useEffect(() => {

@@ -40,7 +40,7 @@ const AddDiagnoseMain = () => {
     }
   }, [dispatch, addSuccess, error]);
   const [file, setFile] = useState("");
-  const [isTrue, setIsTrue] = useState("");
+  const [isTrue, setIsTrue] = useState(false);
 
   const [desc, setDesc] = useState(null);
   const handleChangeDesc = (content) => {
@@ -64,7 +64,7 @@ const AddDiagnoseMain = () => {
       // console.log(body)
       if (userInfo.token) {
         const token = userInfo.token;
-        // console.log(body);
+        console.log(body);
         dispatch(addDiagnose({ body, token }));
         if (addSuccess) {
           toast.success("Thêm mới thành công!!!", ToastObjects);
@@ -81,7 +81,7 @@ const AddDiagnoseMain = () => {
     const metadata = {
       contentType: 'image/jpeg'
     };  
-    const storageRef = ref(storage, 'images/' + files[0].name);
+    const storageRef = ref(storage, 'images/' + new Date());
     const uploadTask = uploadBytesResumable(storageRef, files[0], metadata);  
     uploadTask.on('state_changed',
       (snapshot) => {
@@ -130,7 +130,6 @@ const AddDiagnoseMain = () => {
         <form
           onSubmit={formik.handleSubmit}
           encType="multipart/form-data"
-          disabled={!formik.dirty}
         >
           <div className="content-header">
             <Link to="/department" className="btn btn-danger text-white">

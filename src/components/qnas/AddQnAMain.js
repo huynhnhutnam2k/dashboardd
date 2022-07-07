@@ -14,7 +14,7 @@ import SunEditor, { buttonList } from "suneditor-react";
 import "suneditor/dist/css/suneditor.min.css";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase";
-
+import {departFetch} from "../../redux/departmentSlice"
 
 const ToastObjects = {
   pauseOnFocusLoss: false,
@@ -32,6 +32,7 @@ const AddQnAMain = () => {
     if (userInfo?.token) {
       const token = userInfo?.token;
       dispatch(getByRole(token));
+      dispatch(departFetch())
     }
     if (addSuccess) {
       toast.success("Thêm mới thành công!!!", ToastObjects);
@@ -60,7 +61,7 @@ const AddQnAMain = () => {
         departmentId: values.departmentId,
       };
       const token = userInfo?.token;
-      dispatch(addQuestion({ body, token }));
+      //dispatch(addQuestion({ body, token }));
       // console.log(body);
       if (addSuccess) {
         toast.success("Thêm mới tình huống thành công!!!", ToastObjects);
@@ -76,7 +77,7 @@ const AddQnAMain = () => {
     const metadata = {
       contentType: 'image/jpeg'
     };  
-    const storageRef = ref(storage, 'images/' + files[0].name);
+    const storageRef = ref(storage, 'images/' + new Date());
     const uploadTask = uploadBytesResumable(storageRef, files[0], metadata);  
     uploadTask.on('state_changed',
       (snapshot) => {

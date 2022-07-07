@@ -87,7 +87,7 @@ const handleImageUploadBefore = (files, info, uploadHandler) => {
   const metadata = {
     contentType: 'image/jpeg'
   };  
-  const storageRef = ref(storage, 'images/' + files[0].name);
+  const storageRef = ref(storage, 'images/' + new Date());
   const uploadTask = uploadBytesResumable(storageRef, files[0], metadata);  
   uploadTask.on('state_changed',
     (snapshot) => {
@@ -233,7 +233,7 @@ const handleImageUploadBefore = (files, info, uploadHandler) => {
                       onChange={(e) => setDiagnose(e.target.value)}
                     >
                       <option value="">Chẩn đoán</option>
-                      {listDiagnose.diagnose?.length == undefined ? (
+                      {listDiagnose?.diagnose?.length == undefined ? (
                         <>
                           <option value={listDiagnose?._id}>
                             {listDiagnose?.name}
