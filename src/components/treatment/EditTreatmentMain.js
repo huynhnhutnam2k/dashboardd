@@ -185,7 +185,7 @@ const EditTreatmentMain = () => {
                       <div className="button-group">
                         <div
                           className={`button-check ${
-                            editDesc == false ? "isCheck" : ""
+                            editDesc === false ? "isCheck" : ""
                           }`}
                           onClick={() => setEditDesc(false)}
                         >
@@ -225,7 +225,7 @@ const EditTreatmentMain = () => {
                         </div>
                         <div
                           className={`button-check ${
-                            formik.values.isTrue == false ? "isCheck" : ""
+                            formik.values.isTrue === false ? "isCheck" : ""
                           }`}
                           onClick={() => formik.setFieldValue("isTrue", false)}
                         >

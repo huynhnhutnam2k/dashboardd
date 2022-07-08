@@ -14,14 +14,13 @@ import { getACd, getAllQuestion, reset } from "../../redux/questionSlice";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase";
 import {
-  addDiagnose,
   getDiagByQuestion,
-  getDiagnoseByQuery,
 } from "../../redux/diagnoseSlice";
 import { createTreatment } from "../../redux/treatmentSlice";
 import { getByRole } from "../../redux/authSlice";
 import SunEditor, { buttonList } from "suneditor-react";
 import "suneditor/dist/css/suneditor.min.css";
+
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -35,14 +34,8 @@ const AddTreatmentMain = () => {
   );
   const { listDiagnose } = useSelector((state) => state.diagnose);
   const { addSuccess, error } = useSelector((state) => state.treatment);
-  const [query, setQuery] = useState("");
-  const [name, setName] = useState("");
-  const [note, setNote] = useState(" ");
+  const [query, setQuery] = useState(" ")
   // const [desc, setDesc] = useState("")
-  const [isTrue, setIsTrue] = useState(false);
-  const [situation, setSituation] = useState(undefined);
-  const [diagnose, setDiagnose] = useState("");
-  const [checked, setChecked] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   useEffect(() => {
@@ -57,29 +50,51 @@ const AddTreatmentMain = () => {
       toast.error("Them moi that bai", ToastObjects);
       dispatch(reset());
     }
-  }, [dispatch, situation, addSuccess, error]);
+  }, [dispatch, query, addSuccess, error]);
   const [desc, setDesc] = useState(null);
   const handleChangeDesc = (content) => {
     setDesc(content);
   };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const treatment = {
-      name: name,
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      desc: "",
+      note: "",
+      isTrue: false,
+      situation: "",
+      diagnose: ""
+    },
+    validationSchema: yup.object({
+      // desc : yup.string().required(),
+      name: yup.string().required("required"),
+    }),
+    onSubmit: (values) => {
+      const treatment = {
+      name: values.name,
       desc: desc,
-      note: note,
-      isTrue: isTrue,
-      situation: situation,
-      diagnose: diagnose,
-    };
-    const token = userInfo?.token;
-    // console.log(treatment)
-    dispatch(createTreatment({ treatment, token }));
-  };
-  const handleChange = (e) => {
-    setQuery(e.target.value);
-    setSituation(e.target.value);
-  };
+      note: values.note,
+      isTrue: values.isTrue,
+      situation: values.situation,
+      diagnose: values.diagnose,
+      };
+      const token = userInfo?.token;
+      console.log(treatment);
+      dispatch(createTreatment({ treatment, token }));
+      if (addSuccess) {
+        toast.success("Thêm mới tình huống thành công!!!", ToastObjects);
+      
+      }
+    },
+  });
+
+const handleChangeSituation = (e)=>{
+  formik.setFieldValue("situation", e.target.value)
+  setQuery(e.target.value)
+}
+
+
+  
+
 
 ////
 const handleImageUploadBefore = (files, info, uploadHandler) => {
@@ -128,12 +143,13 @@ const handleImageUploadBefore = (files, info, uploadHandler) => {
   );  
 }
 
+
   return (
     <>
       <Toast />
       <section className="content-main" style={{ maxWidth: "1200px" }}>
         <form
-          onSubmit={handleSubmit}
+          onSubmit={formik.handleSubmit}
           encType="multipart/form-data"
           // disabled={!formik.dirty}
         >
@@ -160,10 +176,10 @@ const handleImageUploadBefore = (files, info, uploadHandler) => {
                       className="form-control"
                       // rows="4"
                       name="name"
-                      value={name}
+                      value={formik.values.name}
                       style={{ width: "100%" }}
                       // required
-                      onChange={(e) => setName(e.target.value)}
+                      onChange={formik.handleChange}
                     ></textarea>
                   </div>
 
@@ -176,22 +192,26 @@ const handleImageUploadBefore = (files, info, uploadHandler) => {
                   />
                   <h6 className="mt-4">Kết quả điều trị</h6>
                   <div className="mb-4  button-group">
-                    <div
-                      className={`button-check ${isTrue ? "isCheck" : ""}`}
-                      onClick={() => setIsTrue(true)}
-                    >
-                      {" "}
-                      Thành công
-                    </div>
-                    <div
-                      className={`button-check ${
-                        isTrue == false ? "isCheck" : ""
-                      }`}
-                      onClick={() => setIsTrue(false)}
-                    >
-                      Thất bại
-                    </div>
-                  </div>
+                        <div
+                          className={`button-check ${
+                            formik.values.isTrue ? "isCheck" : ""
+                          }`}
+                          onClick={() => formik.setFieldValue("isTrue", true)}
+                        >
+                          {" "}
+                          Đúng
+                        </div>
+                        <div
+                          className={`button-check ${
+                            formik.values.isTrue === false ? "isCheck" : ""
+                          }`}
+                          onClick={() => formik.setFieldValue("isTrue", false)}
+                        >
+                          Sai
+                        </div>
+                      </div>
+
+
                   <div className="mb-4">
                     <label className="form-label">Chú ý</label>
                     <input
@@ -199,20 +219,21 @@ const handleImageUploadBefore = (files, info, uploadHandler) => {
                       className="form-control"
                       rows="4"
                       name="note"
-                      value={note}
+                      value={formik.values.note}
                       // required
-                      onChange={(e) => setNote(e.target.value)}
+                      onChange={formik.handleChange}
                     ></input>
                   </div>
                   <div className="mb-4">
                     <select
+                     id="situationSelect"
                       className="form-control mt-3"
                       name="situation"
-                      value={situation}
-                      onChange={handleChange}
+                      value={formik.values.situation}
+                      onChange={handleChangeSituation}
                     >
                       <option value="">Tình huống</option>
-                      {questionCd?.length == undefined ? (
+                      {questionCd?.length === undefined ? (
                         <>
                           <option value={questionCd?._id}>
                             {questionCd?.name}
@@ -229,11 +250,11 @@ const handleImageUploadBefore = (files, info, uploadHandler) => {
                     <select
                       className="form-control mt-3"
                       name="diagnose"
-                      value={diagnose}
-                      onChange={(e) => setDiagnose(e.target.value)}
+                      value={formik.values.diagnose}
+                      onChange={formik.handleChange}
                     >
                       <option value="">Chẩn đoán</option>
-                      {listDiagnose?.diagnose?.length == undefined ? (
+                      {listDiagnose?.diagnose?.length === undefined ? (
                         <>
                           <option value={listDiagnose?._id}>
                             {listDiagnose?.name}
@@ -241,8 +262,9 @@ const handleImageUploadBefore = (files, info, uploadHandler) => {
                         </>
                       ) : (
                         listDiagnose.diagnose?.map((item) => (
+                          
                           <option value={item?._id} key={item._id}>
-                            {item?.name}
+                            {item?.name} 
                           </option>
                         ))
                       )}

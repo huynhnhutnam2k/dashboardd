@@ -49,18 +49,22 @@ const EditProductMain = () => {
   useLayoutEffect(() => {
     dispatch(getAQuestion(id));
     dispatch(getByRole(userInfo.token));
+
     if (updateSuccess) {
       toast.success("Cập nhật tình huống thành công!!!", ToastObjects);
       dispatch(reset());
+      dispatch(getAQuestion(id))
     }
   }, [dispatch, updateSuccess]);
   const [desc, setDesc] = useState(question?.desc);
-  // console.log(question);
+  console.log(question);
   const formik = useFormik({
     initialValues: {
       desc: question?.desc,
       name: question?.name,
       departmentId: question?.departmentId?._id,
+      isFinish:question?.isFinish,
+      isExam: question?.isExam
     },
     validationSchema: yup.object({
       name: yup.string().required("required"),
@@ -74,16 +78,20 @@ const EditProductMain = () => {
           name: values.name,
           desc: values.desc,
           departmentId: values.departmentId?._id,
+          isFinish: values.isFinish,
+          isExam:values.isExam
         };
       } else {
         body = {
           name: values.name,
           desc: desc,
           departmentId: values.departmentId?._id,
+          isFinish: values.isFinish,
+          isExam:values.isExam
         };
       }
 
-      // console.log(body)
+      setEditDesc(false);
       const token = userInfo?.token;
       dispatch(updateQuestion({ body, token, id }));
       // console.log(body);
@@ -175,7 +183,7 @@ const EditProductMain = () => {
                       <div className="button-group">
                         <div
                           className={`button-check ${
-                            editDesc == false ? "isCheck" : ""
+                            editDesc === false ? "isCheck" : ""
                           }`}
                           onClick={() => setEditDesc(false)}
                         >
@@ -232,6 +240,46 @@ const EditProductMain = () => {
                               )
                           )}
                         </select>
+                      </div>
+                      <h6 className="mt-4">Câu Hỏi Đã Hoàn Thành</h6>
+                      <div className="mb-4  button-group">
+                        <div
+                          className={`button-check ${
+                            formik.values.isFinish ? "isCheck" : ""
+                          }`}
+                          onClick={() => formik.setFieldValue("isFinish", true)}
+                        >
+                          {" "}
+                          Hoàn Thành
+                        </div>
+                        <div
+                          className={`button-check ${
+                            formik.values.isFinish === false ? "isCheck" : ""
+                          }`}
+                          onClick={() => formik.setFieldValue("isFinish", false)}
+                        >
+                          Chưa Hoàn Thành
+                        </div>
+                      </div>
+                      <h6 className="mt-4">Câu Hỏi Kiểm Tra</h6>
+                      <div className="mb-4  button-group">
+                        <div
+                          className={`button-check ${
+                            formik.values.isExam ? "isCheck" : ""
+                          }`}
+                          onClick={() => formik.setFieldValue("isExam", true)}
+                        >
+                          {" "}
+                          Là Câu Hỏi Kiểm Tra
+                        </div>
+                        <div
+                          className={`button-check ${
+                            formik.values.isExam === false ? "isCheck" : ""
+                          }`}
+                          onClick={() => formik.setFieldValue("isExam", false)}
+                        >
+                          Không Phải Câu Hỏi Kiểm Tra
+                        </div>
                       </div>
                     </>
                   )}

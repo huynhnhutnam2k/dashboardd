@@ -1,8 +1,7 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import Toast from "../LoadingError/Toast";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import Message from "../LoadingError/Error";
 import Loading from "../LoadingError/Loading";
 import * as yup from "yup";
 import { useFormik } from "formik";
@@ -21,9 +20,8 @@ const ToastObjects = {
 };
 const EditDiagnoseMain = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { id } = useParams();
-  const { userInfo, situation } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => state.auth);
   const { listQuestion } = useSelector((state) => state.question);
   const { diagnose, pending, updateSuccess, error } = useSelector(
     (state) => state.diagnose
@@ -172,7 +170,7 @@ const EditDiagnoseMain = () => {
                       <div className="button-group">
                         <div
                           className={`button-check ${
-                            editDesc == false ? "isCheck" : ""
+                            editDesc === false ? "isCheck" : ""
                           }`}
                           onClick={() => setEditDesc(false)}
                         >
@@ -215,7 +213,7 @@ const EditDiagnoseMain = () => {
                         </div>
                         <div
                           className={`button-check ${
-                            formik.values.isTrue == false ? "isCheck" : ""
+                            formik.values.isTrue ===false ? "isCheck" : ""
                           }`}
                           onClick={() => formik.setFieldValue("isTrue", false)}
                         >

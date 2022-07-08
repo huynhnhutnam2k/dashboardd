@@ -173,6 +173,7 @@ export const updateQuestion = createAsyncThunk(
           "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
         },
       });
+      getAQuestion()
       return res?.data;
     } catch (error) {
       console.log(error.response.data);
