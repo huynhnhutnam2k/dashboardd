@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import { URL } from "./URL_API";
+import { URL } from "./url";
 const URL_API = `${URL}/situation`;
 export const questionSlice = createSlice({
   name: "question",

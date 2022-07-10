@@ -1,9 +1,8 @@
 import { createAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
-// import {URL} from './url'
-// const URL = "https://serverdhyd.herokuapp.com/api/v1"
-const URL = "https://sv-dhyd.herokuapp.com/api";
+import { URL } from "./url";
+const URL_API = `${URL}/department`;
 export const userLocalStorage = JSON.parse(localStorage.getItem("user"))
   ? JSON.parse(localStorage.getItem("user"))
   : null;
@@ -140,7 +139,7 @@ export const authSlice = createSlice({
 
 export const logIn = createAsyncThunk("auth/login", async ({ user }) => {
   try {
-    const res = await axios.post(`${URL}/user/login`, user, {
+    const res = await axios.post(`${URL_API}/user/login`, user, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -162,7 +161,7 @@ export const addUser = createAsyncThunk(
   "auth/register",
   async ({ token, user }) => {
     try {
-      const res = await axios.post(`${URL}/user/register`, user, {
+      const res = await axios.post(`${URL_API}/user/register`, user, {
         headers: {
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -180,7 +179,7 @@ export const addUser = createAsyncThunk(
 );
 export const getAllUser = createAsyncThunk("auth/getAll", async (token) => {
   try {
-    const { data } = await axios.get(`${URL}/user`, {
+    const { data } = await axios.get(`${URL_API}/user`, {
       headers: {
         token: `Bearer ${token}`,
         Vary: "Origin",
@@ -199,7 +198,7 @@ export const getAllUser = createAsyncThunk("auth/getAll", async (token) => {
 
 export const logOut = createAsyncThunk("auth/logOut", async ({ token, id }) => {
   try {
-    const res = await axios.post(`${URL}/user/logout`, id, {
+    const res = await axios.post(`${URL_API}/user/logout`, id, {
       headers: {
         token: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -216,7 +215,7 @@ export const logOut = createAsyncThunk("auth/logOut", async ({ token, id }) => {
 });
 export const getByRole = createAsyncThunk("auth/getByRole", async (token) => {
   try {
-    const res = await axios.get(`${URL}/user/role`, {
+    const res = await axios.get(`${URL_API}/user/role`, {
       headers: {
         token: `Bearer ${token}`,
         Vary: "Origin",

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { URL } from "./URL_API";
+import { URL } from "./url";
 const URL_API = `${URL}/marks`;
 
 

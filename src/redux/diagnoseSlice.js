@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-const url = `https://sv-dhyd.herokuapp.com/api`;
+import { URL } from "./url";
+const URL_API = `${URL}/diagnose`;
 export const getAllDiag = createAsyncThunk(
   "diagnose/getAll",
   async (page, { getState }) => {
@@ -9,7 +10,7 @@ export const getAllDiag = createAsyncThunk(
         diagnose: { page },
       } = getState();
       console.log(page);
-      const res = await axios.get(`${url}/diagnose?page=${page}`, {
+      const res = await axios.get(`${URL_API}/diagnose?page=${page}`, {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
@@ -27,7 +28,7 @@ export const getAllDiag = createAsyncThunk(
 
 export const getADiag = createAsyncThunk("diagnose/getOne", async (id) => {
   try {
-    const res = await axios.get(`${url}/diagnose/${id}`, {
+    const res = await axios.get(`${URL_API}/diagnose/${id}`, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -45,7 +46,7 @@ export const getDiagByQuestion = createAsyncThunk(
   "diagnose/getByQuestion",
   async (query) => {
     try {
-      const { data } = await axios.get(`${url}/diagnose?situationId=${query}`, {
+      const { data } = await axios.get(`${URL_API}/diagnose?situationId=${query}`, {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
@@ -64,7 +65,7 @@ export const getDiagByQuestion = createAsyncThunk(
 //     "diagnose/getByQuery",
 //     async(query) => {
 //         try{
-//             const res = await axios.get(`${url}/diagnose/search?${query}`,{
+//             const res = await axios.get(`${URL_API}/diagnose/search?${query}`,{
 //                 headers: {
 //                     "Content-Type": "application/json",
 //                     "Access-Control-Allow-Origin": "*",
@@ -83,7 +84,7 @@ export const addDiagnose = createAsyncThunk(
   "diagnose/add",
   async ({ body, token }) => {
     try {
-      const res = await axios.post(`${url}/diagnose`, body, {
+      const res = await axios.post(`${URL_API}/diagnose`, body, {
         headers: {
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -104,7 +105,7 @@ export const upDiagnose = createAsyncThunk(
   "diagnose/update",
   async ({ id, body, token }) => {
     try {
-      const { data } = await axios.put(`${url}/diagnose/${id}`, body, {
+      const { data } = await axios.put(`${URL_API}/diagnose/${id}`, body, {
         headers: {
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -125,7 +126,7 @@ export const delDiagnose = createAsyncThunk(
   "diagnose/del",
   async ({ id, token }) => {
     try {
-      const res = await axios.delete(`${url}/diagnose/${id}`, {
+      const res = await axios.delete(`${URL_API}/diagnose/${id}`, {
         headers: {
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
