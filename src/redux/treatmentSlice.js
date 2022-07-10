@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-const URL = "https://sv-dhyd.herokuapp.com/api/treatment";
+import { URL } from "./url";
+const URL_API = `${URL}/treatment`;
 
 export const treatmentSlice = createSlice({
   name: "treatment",
@@ -95,7 +96,7 @@ export const fetchTreatment = createAsyncThunk(
       const {
         treatment: { page },
       } = getState();
-      const res = await axios.get(`${URL}?page=${page}`, {
+      const res = await axios.get(`${URL_API}?page=${page}`, {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
@@ -115,7 +116,7 @@ export const fetchOneTreatment = createAsyncThunk(
   "treatment/getOne",
   async (id) => {
     try {
-      const res = await axios.get(`${URL}/${id}`, {
+      const res = await axios.get(`${URL_API}/${id}`, {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
@@ -136,7 +137,7 @@ export const createTreatment = createAsyncThunk(
   "treatment/create",
   async ({ treatment, token }) => {
     try {
-      const res = await axios.post(`${URL}`, treatment, {
+      const res = await axios.post(`${URL_API}`, treatment, {
         headers: {
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -157,7 +158,7 @@ export const updateTreatment = createAsyncThunk(
   "treatment/update",
   async ({ body, id, token }) => {
     try {
-      const res = await axios.put(`${URL}/${id}`, body, {
+      const res = await axios.put(`${URL_API}/${id}`, body, {
         headers: {
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -178,7 +179,7 @@ export const deleteTreatment = createAsyncThunk(
   "treatment/delete",
   async ({ id, token }) => {
     try {
-      const res = await axios.delete(`${URL}/${id}`, {
+      const res = await axios.delete(`${URL_API}/${id}`, {
         headers: {
           token: `Bearer ${token}`,
           "Content-Type": "application/json",

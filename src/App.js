@@ -13,7 +13,6 @@ import UsersScreen from "./screens/UsersScreen";
 import QnAEditScreen from "./screens/QnAEditScreen";
 import DepartmentScreen from "./screens/DepartmentScreen";
 import NotFound from "./screens/NotFound";
-import PrivateRouter from "./PrivateRouter";
 import AddDpm from "./screens/AddDpm";
 import AddDiagnose from "./screens/AddDiagnose";
 import DepartEditScreen from "./screens/DepartEditScreen";
@@ -22,6 +21,7 @@ import TreatmentScreen from "./screens/TreatmentScreen";
 import AddTreatment from "./screens/AddTreatment";
 import TreatmentEditScreen from "./screens/TreatmentEditScreen";
 import DiagnoseEditScreen from "./screens/DiagnoseEditScreen";
+import MarksManagement from "./screens/MarksManagement";
 
 // import TypographyOptions from "@mui/material/styles/createTypography"
 // import { TypographyOptions } from '@mui/material/styles/createTypography';
@@ -58,6 +58,8 @@ function App() {
           <Route path="/qna/:id/edit" element={<QnAEditScreen />} />
           <Route path="/login" element={<Login />} />
           <Route path="*" element={<NotFound />} />
+          <Route path="/marksmanagement" element={<MarksManagement />} />
+
         </Routes>
       </Router>
     </ThemeProvider>

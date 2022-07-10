@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-const url = "https://sv-dhyd.herokuapp.com/api/situation";
+import { URL } from "./URL_API";
+const URL_API = `${URL}/situation`;
 export const questionSlice = createSlice({
   name: "question",
   initialState: {
@@ -127,7 +128,7 @@ export const getAllQuestion = createAsyncThunk(
       const {
         question: { page },
       } = getState();
-      const res = await axios.get(`${url}/page/${page}`, {
+      const res = await axios.get(`${URL_API}/page/${page}`, {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
@@ -144,7 +145,7 @@ export const getAllQuestion = createAsyncThunk(
 );
 export const getAQuestion = createAsyncThunk("question/get", async (id) => {
   try {
-    const res = await axios.get(`${url}/${id}`, {
+    const res = await axios.get(`${URL_API}/${id}`, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -163,7 +164,7 @@ export const updateQuestion = createAsyncThunk(
   "question/update",
   async ({ body, token, id }) => {
     try {
-      const res = await axios.put(`${url}/${id}`, body, {
+      const res = await axios.put(`${URL_API}/${id}`, body, {
         headers: {
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -184,7 +185,7 @@ export const addQuestion = createAsyncThunk(
   "question/add",
   async ({ body, token }) => {
     try {
-      const res = await axios.post(`${url}`, body, {
+      const res = await axios.post(`${URL_API}`, body, {
         headers: {
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -205,7 +206,7 @@ export const deleteQuestion = createAsyncThunk(
   "question/delete",
   async ({ id, token }) => {
     try {
-      const res = await axios.delete(`${url}/${id}`, {
+      const res = await axios.delete(`${URL_API}/${id}`, {
         headers: {
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -227,7 +228,7 @@ export const getQuestionByCate = createAsyncThunk(
   "question/getByCate",
   async (id) => {
     try {
-      const res = await axios.get(`${url}/categories/${id}`);
+      const res = await axios.get(`${URL_API}/categories/${id}`);
       return res?.data;
     } catch (error) {
       console.log(error.response.data);
@@ -238,7 +239,7 @@ export const getQuestionByCate = createAsyncThunk(
 //     "question/getByDepart",
 //     async(id) => {
 //         try {
-//             const res = await axios.get(`${url}/department/${id}`)
+//             const res = await axios.get(`${URL_API}/department/${id}`)
 //             return res?.data
 //         } catch (error) {
 //             console.log(error.response.data)

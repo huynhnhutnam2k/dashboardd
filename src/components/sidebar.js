@@ -98,6 +98,16 @@ const Sidebar = () => {
                 <span className="text">Thêm nhân viên</span>
               </NavLink>
             </li> */}
+            <li className="menu-item">
+              <NavLink
+                activeClassName="active"
+                className="menu-link"
+                to="/marksmanagement"
+              >
+                <i class="icon far fa-user-md-chat"></i>
+                <span className="text">Điểm Sinh Viên</span>
+              </NavLink>
+            </li>
           </ul>
           <br />
           <br />
