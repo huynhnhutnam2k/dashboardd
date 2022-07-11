@@ -161,7 +161,7 @@ const AddDiagnoseMain = () => {
                       value={formik.values.preliminary}
                       onChange={handleChangePriliminary}
                     >
-                      <option value="">Chẩn đoán</option>
+                      <option value="">Chẩn đoán sơ bộ</option>
                       {prebysituationid?.length === undefined ? (
                         <>
                           <option value={prebysituationid?._id}>

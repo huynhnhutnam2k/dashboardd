@@ -61,6 +61,7 @@ const MainTreatment = () => {
   const handleChange = (e) => {
     navigate(`/treatment/${e.target.dataset.id}/edit`);
   };
+  console.log(listTreatment)
   const handleConfirm = () => {
     const id = idTreatment;
     const token = userInfo?.token;
@@ -125,7 +126,8 @@ const MainTreatment = () => {
                           Tên điều trị
                         </TableCell>
                         <TableCell align="center">Tên tình huống</TableCell>
-                        <TableCell align="center">Tên chẩn đoán</TableCell>
+                        <TableCell align="center">Tên chẩn đoán sơ bộ</TableCell>
+                        <TableCell align="center">Tên chẩn đoán cuối cùng</TableCell>
                         <TableCell align="center">
                           Điều trị thành công
                         </TableCell>
@@ -151,6 +153,9 @@ const MainTreatment = () => {
                           </TableCell>
                           <TableCell align="center">
                             {row.situation?.name}
+                          </TableCell>
+                          <TableCell align="center">
+                            {row.preliminary?.name}
                           </TableCell>
                           <TableCell align="center">
                             {row.diagnose?.name}
