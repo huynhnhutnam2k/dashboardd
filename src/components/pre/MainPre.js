@@ -15,15 +15,13 @@ import Modal from "@mui/material/Modal";
 import Stack from "@mui/material/Stack";
 import momment from "moment";
 import Loading from "../LoadingError/Loading";
-import { allDepartment, departFetch } from "../../redux/departmentSlice";
-import {
-  decrementDiagnose,
-  delDiagnose,
-  getAllDiag,
-  incrementDiagnose,
-  getADiag
-} from "../../redux/diagnoseSlice";
-import { decrement, increment } from "../../redux/questionSlice";
+// import {
+//   decrementPreliminary,
+//   delPreliminary,
+//   incrementPreliminary,
+// } from "../../redux/preliminarySlice";
+import { getListPre, deletePre } from "../../redux/preliminarySlice";
+
 const style = {
   position: "absolute",
   top: "50%",
@@ -36,33 +34,32 @@ const style = {
   p: 4,
 };
 
-const MainDiagnose = () => {
+const MainPre = () => {
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const { userInfo } = useSelector((state) => state.auth);
-  const { pending, listDiagnose, deleteSuccess, page, maxPage } = useSelector(
-    (state) => state.diagnose
+  const { pending, listPre, deleteSuccess, page, maxPage } = useSelector(
+    (state) => state.pre
   );
-  const [idDiagnose, setIdDiagnose] = useState("");
+  console.log(listPre);
+  const [idPreliminary, setIdPreliminary] = useState("");
   const navigate = useNavigate();
   useEffect(() => {
-    dispatch(getAllDiag());
-  }, [dispatch, deleteSuccess, listDiagnose?.length, page]);
-  const handleChange = async (e) => {
-    await dispatch(getADiag(e.target.dataset.id))
-    navigate(`/diagnose/${e.target.dataset.id}/edit`);
+    dispatch(getListPre());
+  }, [dispatch, deleteSuccess, listPre?.length, page]);
+  const handleChange = (e) => {
+    navigate(`/preliminary/${e.target.dataset.id}/edit`);
   };
   const handleConfirm = () => {
-    const id = idDiagnose;
+    const id = idPreliminary;
     const token = userInfo?.token;
-    dispatch(delDiagnose({ id, token }));
+    dispatch(deletePre({ id, token }));
     setOpen(!open);
   };
   const handleDelete = (e) => {
     setOpen(true);
-    setIdDiagnose(e.target.dataset.id);
+    setIdPreliminary(e.target.dataset.id);
   };
   return (
     <>
@@ -70,7 +67,7 @@ const MainDiagnose = () => {
         <div className="content-header">
           <h2 className="content-title">Danh sách chẩn đoán</h2>
           <div>
-            <Link to="/add-diagnose" className="btn btn-primary">
+            <Link to="/add-pre" className="btn btn-primary">
               Thêm mới
             </Link>
           </div>
@@ -86,7 +83,21 @@ const MainDiagnose = () => {
                   className="form-control p-2"
                 />
               </div>
-
+              <div className="col-lg-2 col-6 col-md-3">
+                <select className="form-select">
+                  <option>Thể loại</option>
+                  <option>Electronics</option>
+                  <option>Clothings</option>
+                  <option>Something else</option>
+                </select>
+              </div>
+              <div className="col-lg-2 col-6 col-md-3">
+                <select className="form-select">
+                  <option>Latest added</option>
+                  <option>Cheap first</option>
+                  <option>Most viewed</option>
+                </select>
+              </div>
             </div>
           </header>
 
@@ -99,9 +110,8 @@ const MainDiagnose = () => {
                   <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                       <TableRow>
-                        <TableCell>Chuẩn đoán sau cùng</TableCell>
+                        <TableCell>Name</TableCell>
                         <TableCell align="center">Tên tình huống</TableCell>
-                        <TableCell align="center">Tên Chẩn đoán sơ bộ</TableCell>
                         <TableCell align="center">Số cách điều trị</TableCell>
                         <TableCell align="center">Đúng?</TableCell>
                         <TableCell align="center">Created At</TableCell>
@@ -109,7 +119,7 @@ const MainDiagnose = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {listDiagnose?.map((row) => (
+                      {listPre?.map((row) => (
                         <TableRow
                           key={row._id}
                           sx={{
@@ -119,14 +129,11 @@ const MainDiagnose = () => {
                           <TableCell component="th" scope="row" align="center">
                             {row.name}
                           </TableCell>
-                          <TableCell component="th" scope="row" align="center">
-                            {row.preliminary?.situation?.name}
+                          <TableCell align="center">
+                            {row.situation?.name}
                           </TableCell>
                           <TableCell align="center">
-                            {row.preliminary?.name}
-                          </TableCell>
-                          <TableCell align="center">
-                            {row.treatments.length}
+                            {row.treatment?.length}
                           </TableCell>
                           {row.isTrue ? (
                             <TableCell align="center">Đúng</TableCell>
@@ -171,11 +178,11 @@ const MainDiagnose = () => {
             )}
             <nav className="float-end mt-4" aria-label="Page navigation">
               <ul className="pagination">
-                <li className={`page-item ${page == 1 ? "disabled" : ""} `}>
+                <li className={`page-item ${page === 1 ? "disabled" : ""} `}>
                   <Link
                     className="page-link"
                     to="#"
-                    onClick={() => dispatch(decrementDiagnose())}
+                  //onClick={() => dispatch(decrementPreliminary())}
                   >
                     Previous
                   </Link>
@@ -191,7 +198,7 @@ const MainDiagnose = () => {
                   <Link
                     className="page-link"
                     to="#"
-                    onClick={() => dispatch(incrementDiagnose())}
+                  //onClick={() => dispatch(incrementPreliminary())}
                   >
                     Next
                   </Link>
@@ -233,4 +240,4 @@ const MainDiagnose = () => {
   );
 };
 
-export default MainDiagnose;
+export default MainPre;

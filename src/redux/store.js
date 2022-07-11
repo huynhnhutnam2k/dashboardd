@@ -5,6 +5,7 @@ import departmentReducer from './departmentSlice'
 import diagnoseReducer from './diagnoseSlice'
 import treatmentReducer from './treatmentSlice'
 import markReducer from './markSlice'
+import preliminaryReducer from './preliminarySlice'
 
 
 const combinedReducer = combineReducers({
@@ -13,7 +14,8 @@ const combinedReducer = combineReducers({
     department: departmentReducer,
     diagnose: diagnoseReducer,
     treatment: treatmentReducer,
-    mark: markReducer
+    mark: markReducer,
+    pre: preliminaryReducer
 });
 const rootReducer = (state, action) => {
     if (action.type === 'question/reset') {

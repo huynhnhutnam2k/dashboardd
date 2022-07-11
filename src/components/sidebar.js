@@ -68,6 +68,16 @@ const Sidebar = () => {
               <NavLink
                 activeClassName="active"
                 className="menu-link"
+                to="/preliminary"
+              >
+                <i class="icon fal fa-stethoscope"></i>
+                <span className="text">Chuẩn Đoán Sơ Bộ</span>
+              </NavLink>
+            </li>
+            <li className="menu-item">
+              <NavLink
+                activeClassName="active"
+                className="menu-link"
                 to="/diagnose"
               >
                 {/* <i className="icon fas fa-user"></i> */}
@@ -75,7 +85,7 @@ const Sidebar = () => {
                  */}
                 {/* <i class="fa-solid fa-stethoscope"></i> */}
                 <i class="icon fal fa-stethoscope"></i>
-                <span className="text">Chẩn đoán</span>
+                <span className="text">Chẩn đoán Lâm Sàn</span>
               </NavLink>
             </li>
             <li className="menu-item">

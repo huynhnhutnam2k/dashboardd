@@ -7,7 +7,7 @@ import Loading from "../LoadingError/Loading";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllDiag, getDiagByQuestion } from "../../redux/diagnoseSlice";
+import { getAllDiag, getDiagnosesByPreliminary } from "../../redux/diagnoseSlice";
 import { getACd, reset } from "../../redux/questionSlice";
 import { fetchOneTreatment, updateTreatment } from "../../redux/treatmentSlice";
 import { getByRole } from "../../redux/authSlice";
@@ -36,7 +36,7 @@ const EditTreatmentMain = () => {
     const token = userInfo?.token;
     dispatch(getByRole(token));
     dispatch(fetchOneTreatment(id));
-    dispatch(getDiagByQuestion(query));
+    dispatch(getDiagnosesByPreliminary(query));
     dispatch(getAllDiag());
     if (updateSuccess) {
       toast.success("Cập nhật tình huống thành công!!!", ToastObjects);
@@ -94,9 +94,9 @@ const EditTreatmentMain = () => {
     /** @type {any} */
     const metadata = {
       contentType: 'image/jpeg'
-    };  
+    };
     const storageRef = ref(storage, 'images/' + new Date());
-    const uploadTask = uploadBytesResumable(storageRef, files[0], metadata);  
+    const uploadTask = uploadBytesResumable(storageRef, files[0], metadata);
     uploadTask.on('state_changed',
       (snapshot) => {
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
@@ -109,7 +109,7 @@ const EditTreatmentMain = () => {
             console.log('Upload is running');
             break;
         }
-      }, 
+      },
       (error) => {
         switch (error.code) {
           case 'storage/unauthorized':
@@ -118,24 +118,24 @@ const EditTreatmentMain = () => {
           case 'storage/unknown':
             break;
         }
-      }, 
+      },
       () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {        
-                const response = {
-                  result: [
-                    {
-                      url: downloadURL,
-                      name: files[0].name,
-                      size: files[0].size,
-                    },
-                  ],
-                }
-                uploadHandler(response)        
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          const response = {
+            result: [
+              {
+                url: downloadURL,
+                name: files[0].name,
+                size: files[0].size,
+              },
+            ],
+          }
+          uploadHandler(response)
         });
       }
-    );  
+    );
   }
-  
+
   // console.log(editDesc)
   return (
     <>
@@ -184,17 +184,15 @@ const EditTreatmentMain = () => {
                       <h6>Bạn có muốn sửa mô tả không?</h6>
                       <div className="button-group">
                         <div
-                          className={`button-check ${
-                            editDesc === false ? "isCheck" : ""
-                          }`}
+                          className={`button-check ${editDesc === false ? "isCheck" : ""
+                            }`}
                           onClick={() => setEditDesc(false)}
                         >
                           Không
                         </div>
                         <div
-                          className={`button-check ${
-                            editDesc ? "isCheck" : ""
-                          }`}
+                          className={`button-check ${editDesc ? "isCheck" : ""
+                            }`}
                           onClick={() => setEditDesc(true)}
                         >
                           Có
@@ -215,18 +213,16 @@ const EditTreatmentMain = () => {
                       <h6 className="mt-4">Kết quả điều trị</h6>
                       <div className="mb-4  button-group">
                         <div
-                          className={`button-check ${
-                            formik.values.isTrue ? "isCheck" : ""
-                          }`}
+                          className={`button-check ${formik.values.isTrue ? "isCheck" : ""
+                            }`}
                           onClick={() => formik.setFieldValue("isTrue", true)}
                         >
                           {" "}
                           Đúng
                         </div>
                         <div
-                          className={`button-check ${
-                            formik.values.isTrue === false ? "isCheck" : ""
-                          }`}
+                          className={`button-check ${formik.values.isTrue === false ? "isCheck" : ""
+                            }`}
                           onClick={() => formik.setFieldValue("isTrue", false)}
                         >
                           Sai

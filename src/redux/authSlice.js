@@ -2,7 +2,8 @@ import { createAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
 import { URL } from "./url";
-const URL_API = `${URL}/department`;
+const URL_API = URL;
+console.log("URL", URL_API)
 export const userLocalStorage = JSON.parse(localStorage.getItem("user"))
   ? JSON.parse(localStorage.getItem("user"))
   : null;

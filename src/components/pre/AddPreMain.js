@@ -3,111 +3,130 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import * as yup from "yup";
-import Message from "../LoadingError/Error";
-import Loading from "../LoadingError/Loading";
+
 import Toast from "../LoadingError/Toast";
-import { useNavigate } from "react-router-dom";
-import { unwrapResult } from "@reduxjs/toolkit";
-import { getACd, getAllQuestion, reset } from "../../redux/questionSlice";
-import { addDiagnose } from "../../redux/diagnoseSlice";
+
+import { reset } from "../../redux/questionSlice";
 import { getByRole } from "../../redux/authSlice";
+import SunEditor, { buttonList } from "suneditor-react";
 import "suneditor/dist/css/suneditor.min.css";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase";
-import { getPreliminariesBySituation } from "../../redux/preliminarySlice"
-import { getDiagnosesByPreliminary } from "../../redux/diagnoseSlice";
+import { addPre } from "../../redux/preliminarySlice";
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
   pauseOnHouver: false,
   autoClose: 2000,
 };
-const AddDiagnoseMain = () => {
+const AddPreMain = () => {
   const { userInfo, situation } = useSelector((state) => state.auth);
-  const { prebysituationid, addSuccess, error } = useSelector((state) => state.pre)
-  const { listQuestion: questionCd } = useSelector((state) => state.question)
-  const navigate = useNavigate();
+  const { addSuccess, error } = useSelector((state) => state.pre);
   const dispatch = useDispatch();
-  const [query, setQuery] = useState()
-
   useEffect(() => {
-    dispatch(getAllQuestion())
     dispatch(getByRole(userInfo?.token));
-    query && dispatch(getPreliminariesBySituation(query));
     if (addSuccess) {
-      toast.success("Them thannh cong", ToastObjects);
+      toast.success("Thêm mới thành công", ToastObjects);
       dispatch(reset());
     }
     if (error) {
-      toast.error("Them that bai", ToastObjects);
+      toast.error("Thêm mới thất bại", ToastObjects);
       dispatch(reset());
     }
-  }, [dispatch, addSuccess, error, query]);
-  const [file, setFile] = useState("");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, addSuccess, error]);
+  // const [file, setFile] = useState("");
   const [isTrue, setIsTrue] = useState(false);
 
   const [desc, setDesc] = useState(null);
-
-  const handleChangeSituation = async (e) => {
-    formik.setFieldValue("situation", e.target.value)
-    await e.target.value !== "" && setQuery(e.target.value)
-
-    console.log(query)
-
-  }
-  const handleChangePriliminary = async (e) => {
-    formik.setFieldValue("preliminary", e.target.value)
-  }
-
-
-
+  const handleChangeDesc = (content) => {
+    setDesc(content);
+  };
   const formik = useFormik({
     initialValues: {
       name: "",
+      desc: "",
       situation: "",
       isTrue: isTrue,
-      preliminary: ""
     },
 
     onSubmit: (values) => {
-      const body = {
+      const pre = {
         name: values.name,
+        desc: desc,
         situation: values.situation,
         isTrue: isTrue,
-        preliminary: values.preliminary
-
       };
-      // console.log(body)
       if (userInfo.token) {
         const token = userInfo.token;
-        console.log(body);
-        dispatch(addDiagnose({ body, token }));
+        dispatch(addPre(pre, token));
+        // console.log(pre, token);
         if (addSuccess) {
           toast.success("Thêm mới thành công!!!", ToastObjects);
-          // dispatch
         }
       }
     },
-    // disabled: !formik.dirty,
   });
 
-  ///
-
+  const handleImageUploadBefore = (files, info, uploadHandler) => {
+    /** @type {any} */
+    const metadata = {
+      contentType: "image/jpeg",
+    };
+    const storageRef = ref(storage, "images/" + new Date());
+    const uploadTask = uploadBytesResumable(storageRef, files[0], metadata);
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log("Upload is " + progress + "% done");
+        // eslint-disable-next-line default-case
+        switch (snapshot.state) {
+          case "paused":
+            console.log("Upload is paused");
+            break;
+          case "running":
+            console.log("Upload is running");
+            break;
+        }
+      },
+      (error) => {
+        // eslint-disable-next-line default-case
+        switch (error.code) {
+          case "storage/unauthorized":
+            break;
+          case "storage/unknown":
+            break;
+        }
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          const response = {
+            result: [
+              {
+                url: downloadURL,
+                name: files[0].name,
+                size: files[0].size,
+              },
+            ],
+          };
+          uploadHandler(response);
+        });
+      }
+    );
+  };
 
   return (
     <>
       <Toast />
       <section className="content-main" style={{ maxWidth: "1200px" }}>
-        <form
-          onSubmit={formik.handleSubmit}
-          encType="multipart/form-data"
-        >
+        <form onSubmit={formik.handleSubmit} encType="multipart/form-data">
           <div className="content-header">
             <Link to="/department" className="btn btn-danger text-white">
               Trở về
             </Link>
-            <h2 className="content-title">Thêm chẩn đoán</h2>
+            <h2 className="content-title">Thêm chẩn đoán sơ bộ</h2>
             <div>
               <button className="btn btn-primary" type="submit">
                 Thêm
@@ -131,53 +150,33 @@ const AddDiagnoseMain = () => {
                       onChange={formik.handleChange}
                     ></input>
                   </div>
-
+                  <SunEditor
+                    className="mb-4"
+                    onChange={handleChangeDesc}
+                    onImageUploadBefore={handleImageUploadBefore}
+                    setOptions={{ buttonList: buttonList.complex, height: 500 }}
+                  />
                   <div className="mb-4">
                     <select
-                      id="situationSelect"
                       className="form-control mt-3"
                       name="situation"
                       value={formik.values.situation}
-                      onChange={handleChangeSituation}
+                      onChange={formik.handleChange}
                     >
-                      <option value="">Tình huống</option>
-                      {questionCd?.length === undefined ? (
+                      <option value="">situation</option>
+                      {situation?.length === undefined ? (
                         <>
-                          <option value={questionCd?._id}>
-                            {questionCd?.name}
+                          <option value={situation?._id}>
+                            {situation?.name}
                           </option>
                         </>
                       ) : (
-                        questionCd?.map((item) => (
+                        situation?.map((item) => (
                           <option value={item?._id}>{item?.name}</option>
                         ))
                       )}
                     </select>
                   </div>
-                  <div className="mb-4">
-                    <select
-                      className="form-control mt-3"
-                      name="diagnose"
-                      value={formik.values.preliminary}
-                      onChange={handleChangePriliminary}
-                    >
-                      <option value="">Chẩn đoán</option>
-                      {prebysituationid?.length === undefined ? (
-                        <>
-                          <option value={prebysituationid?._id}>
-                            {prebysituationid?.name}
-                          </option>
-                        </>
-                      ) : (
-                        prebysituationid?.map((item) => (
-                          <option value={item?._id} key={item._id}>
-                            {item?.name}
-                          </option>
-                        ))
-                      )}
-                    </select>
-                  </div>
-
                   <div className="mb-4">
                     <label className="form-label">Đúng</label>
                     <input
@@ -208,4 +207,4 @@ const AddDiagnoseMain = () => {
   );
 };
 
-export default AddDiagnoseMain;
+export default AddPreMain;

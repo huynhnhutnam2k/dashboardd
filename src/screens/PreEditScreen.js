@@ -1,18 +1,19 @@
 import Sidebar from "../components/sidebar";
 import Header from "../components/Header";
 // import EditDepartMain from "../components/deparment/EditDepartMain";
-import EditDiagnoseMain from "../components/diagnose/EditDiagnoseMain";
-const DiagnoseEditMain = () => {
+import EditPreliminaryMain from "../components/pre/EditPreliminaryMain";
+const PreEditScreen = () => {
   // const productId = match.params.id;
 
   return (
     <>
+      {console.log("ok")}
       <Sidebar />
       <main className="main-wrap">
         <Header />
-        <EditDiagnoseMain />
+        <EditPreliminaryMain />
       </main>
     </>
   );
 };
-export default DiagnoseEditMain;
+export default PreEditScreen;

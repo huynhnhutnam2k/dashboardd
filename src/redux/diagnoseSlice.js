@@ -10,7 +10,7 @@ export const getAllDiag = createAsyncThunk(
         diagnose: { page },
       } = getState();
       console.log(page);
-      const res = await axios.get(`${URL_API}/diagnose?page=${page}`, {
+      const res = await axios.get(`${URL_API}?page=${page}`, {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
@@ -28,7 +28,7 @@ export const getAllDiag = createAsyncThunk(
 
 export const getADiag = createAsyncThunk("diagnose/getOne", async (id) => {
   try {
-    const res = await axios.get(`${URL_API}/diagnose/${id}`, {
+    const res = await axios.get(`${URL_API}/${id}`, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -42,30 +42,12 @@ export const getADiag = createAsyncThunk("diagnose/getOne", async (id) => {
     console.log(error.response.data);
   }
 });
-export const getDiagByQuestion = createAsyncThunk(
-  "diagnose/getByQuestion",
-  async (query) => {
-    try {
-      const { data } = await axios.get(`${URL_API}/diagnose?situationId=${query}`, {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Headers":
-            "origin, x-requested-with, content-type",
-          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
-        },
-      });
-      return data;
-    } catch (error) {
-      console.log(error.response.data);
-    }
-  }
-);
+
 // export const getDiagnoseByQuery = createAsyncThunk(
 //     "diagnose/getByQuery",
 //     async(query) => {
 //         try{
-//             const res = await axios.get(`${URL_API}/diagnose/search?${query}`,{
+//             const res = await axios.get(`${URL_API}/search?${query}`,{
 //                 headers: {
 //                     "Content-Type": "application/json",
 //                     "Access-Control-Allow-Origin": "*",
@@ -84,7 +66,7 @@ export const addDiagnose = createAsyncThunk(
   "diagnose/add",
   async ({ body, token }) => {
     try {
-      const res = await axios.post(`${URL_API}/diagnose`, body, {
+      const res = await axios.post(`${URL_API}`, body, {
         headers: {
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -105,7 +87,7 @@ export const upDiagnose = createAsyncThunk(
   "diagnose/update",
   async ({ id, body, token }) => {
     try {
-      const { data } = await axios.put(`${URL_API}/diagnose/${id}`, body, {
+      const { data } = await axios.put(`${URL_API}/${id}`, body, {
         headers: {
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -126,7 +108,7 @@ export const delDiagnose = createAsyncThunk(
   "diagnose/del",
   async ({ id, token }) => {
     try {
-      const res = await axios.delete(`${URL_API}/diagnose/${id}`, {
+      const res = await axios.delete(`${URL_API}/${id}`, {
         headers: {
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -142,11 +124,25 @@ export const delDiagnose = createAsyncThunk(
     }
   }
 );
+
+export const getDiagnosesByPreliminary = createAsyncThunk(
+  "diag/getbypreliminary",
+  async (id) => {
+    try {
+      const response = await axios.get(`${URL_API}/getbypreliminaryid/${id}`);
+      console.log("data", response.data)
+      return response.data;
+    } catch (error) {
+      console.log(error.response.data);
+    }
+  }
+)
+
 export const diagnoseSlice = createSlice({
   name: "diagnose",
   initialState: {
     allDiagnose: [],
-    listDiagnose: [],
+    diagnosesByPreliminary: [],
     diagnose: {},
     pending: false,
     success: false,
@@ -190,14 +186,15 @@ export const diagnoseSlice = createSlice({
         state.error = true;
         state.pending = false;
       })
-      .addCase(getDiagByQuestion.pending, (state) => {
+      .addCase(getDiagnosesByPreliminary.pending, (state) => {
         state.pending = true;
       })
-      .addCase(getDiagByQuestion.fulfilled, (state, action) => {
-        state.listDiagnose = action.payload;
+      .addCase(getDiagnosesByPreliminary.fulfilled, (state, action) => {
+        state.diagnosesByPreliminary = action.payload;
         state.pending = false;
+        console.log("act", state.diagnosesByPreliminary)
       })
-      .addCase(getDiagByQuestion.rejected, (state) => {
+      .addCase(getDiagnosesByPreliminary.rejected, (state) => {
         state.error = true;
         state.pending = false;
       })

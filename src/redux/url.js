@@ -1,1 +1,1 @@
-export const URL = process.env.API
+export const URL = "http://localhost:8000/api"

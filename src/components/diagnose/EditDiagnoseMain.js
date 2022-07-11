@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import Toast from "../LoadingError/Toast";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -7,11 +7,9 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import { getADiag, upDiagnose } from "../../redux/diagnoseSlice";
-import SunEditor, { buttonList } from "suneditor-react";
 import { getByRole } from "../../redux/authSlice";
 import { getAllQuestion, reset } from "../../redux/questionSlice";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { storage } from "../firebase";
+import { getPreliminariesBySituation } from "../../redux/preliminarySlice"
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -22,49 +20,28 @@ const EditDiagnoseMain = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
   const { userInfo } = useSelector((state) => state.auth);
-  const { listQuestion } = useSelector((state) => state.question);
+  const { listQuestion: questionCd } = useSelector((state) => state.question);
   const { diagnose, pending, updateSuccess, error } = useSelector(
     (state) => state.diagnose
   );
-  useLayoutEffect(() => {
-    dispatch(getADiag(id));
-    const token = userInfo?.token;
-    dispatch(getByRole(token));
-    dispatch(getAllQuestion());
-    // !editDesc && setDesc(diagnose?.desc);
-    if (updateSuccess) {
-      toast.success("Cập nhật thành công", ToastObjects);
-      dispatch(reset());
-    }
-  }, [dispatch, updateSuccess, error]);
-  const [desc, setDesc] = useState(diagnose?.desc);
+  const { prebysituationid } = useSelector((state) => state.pre)
   const formik = useFormik({
     initialValues: {
       name: diagnose?.name,
-      desc: diagnose?.desc,
       isTrue: diagnose?.isTrue,
-      situationId: diagnose?.situationId?._id,
+      preliminary: diagnose?.preliminary?._id,
+      situation: diagnose?.preliminary?.situation?._id
     },
     validationSchema: yup.object({}),
     enableReinitialize: true,
     onSubmit: (values) => {
       let body;
-
-      if (editDesc === false) {
-        body = {
-          name: values.name,
-          desc: values.desc,
-          isTrue: values.isTrue,
-          situationId: values.situationId,
-        };
-      } else {
-        body = {
-          name: values.name,
-          isTrue: values.isTrue,
-          desc: desc,
-          situationId: values.situationId,
-        };
-      }
+      body = {
+        name: values.name,
+        desc: values.desc,
+        isTrue: values.isTrue,
+        preliminary: values.preliminary,
+      };
 
       // console.log(body);
       const token = userInfo?.token;
@@ -72,57 +49,33 @@ const EditDiagnoseMain = () => {
       //
     },
   });
-  const [editDesc, setEditDesc] = useState(false);
-  const handleChangeDesc = (content) => {
-    setDesc(content);
-  };
+  const [query, setQuery] = useState()
 
-  const handleImageUploadBefore = (files, info, uploadHandler) => {
-    /** @type {any} */
-    const metadata = {
-      contentType: 'image/jpeg'
-    };  
-    const storageRef = ref(storage, 'images/' + new Date());
-    const uploadTask = uploadBytesResumable(storageRef, files[0], metadata);  
-    uploadTask.on('state_changed',
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('Upload is ' + progress + '% done');
-        switch (snapshot.state) {
-          case 'paused':
-            console.log('Upload is paused');
-            break;
-          case 'running':
-            console.log('Upload is running');
-            break;
-        }
-      }, 
-      (error) => {
-        switch (error.code) {
-          case 'storage/unauthorized':
-            break;
-            break;
-          case 'storage/unknown':
-            break;
-        }
-      }, 
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {        
-                const response = {
-                  result: [
-                    {
-                      url: downloadURL,
-                      name: files[0].name,
-                      size: files[0].size,
-                    },
-                  ],
-                }
-                uploadHandler(response)        
-        });
-      }
-    );  
+  const handleChangeSituation = async (e) => {
+    formik.setFieldValue("situation", e.target.value)
+    await e.target.value !== "" && setQuery(e.target.value)
+
   }
+  const handleChangePriliminary = async (e) => {
+    formik.setFieldValue("preliminary", e.target.value)
+  }
+  useEffect(async () => {
+    await dispatch(getPreliminariesBySituation(id))
+  }, [dispatch])
+  useLayoutEffect(() => {
+    dispatch(getADiag(id));
+    const token = userInfo?.token;
+    dispatch(getByRole(token));
+    dispatch(getAllQuestion());
+    query && dispatch(getPreliminariesBySituation(query));
+    // !editDesc && setDesc(diagnose?.desc);
+    if (updateSuccess) {
+      toast.success("Cập nhật thành công", ToastObjects);
+      dispatch(reset());
+    }
+  }, [dispatch, updateSuccess, error, query]);
 
+  console.log(formik.values.preliminary, prebysituationid)
   return (
     <>
       <Toast />
@@ -132,7 +85,7 @@ const EditDiagnoseMain = () => {
             <Link to="/diagnose" className="btn btn-danger text-white">
               Go to products
             </Link>
-            <h2 className="content-title">Cập nhật chẩn đoán</h2>
+            <h2 className="content-title">Cập nhật chẩn đoán cuối cùng</h2>
             <div>
               <button type="submit" className="btn btn-primary">
                 Cập nhật
@@ -157,64 +110,22 @@ const EditDiagnoseMain = () => {
                           onChange={formik.handleChange}
                         ></input>
                       </div>
-                      <div className="mb-4">
-                        <label className="form-label">Mô tả</label>
-                        <div
-                          className="form-control"
-                          dangerouslySetInnerHTML={{
-                            __html: `${formik.values.desc}`,
-                          }}
-                        />
-                      </div>
-                      <h6>Bạn có muốn sửa mô tả không?</h6>
-                      <div className="button-group">
-                        <div
-                          className={`button-check ${
-                            editDesc === false ? "isCheck" : ""
-                          }`}
-                          onClick={() => setEditDesc(false)}
-                        >
-                          Không
-                        </div>
-                        <div
-                          className={`button-check ${
-                            editDesc ? "isCheck" : ""
-                          }`}
-                          onClick={() => setEditDesc(true)}
-                        >
-                          Có
-                        </div>
-                      </div>
-                      {editDesc && (
-                        <SunEditor
-                          className="mb-4"
-                          // defaultValue={formik.values.desc}
-                          // defaultValue="<p>The editor's default value</p>"
-                          onImageUploadBefore={handleImageUploadBefore}
-                          onChange={handleChangeDesc}
-                          setOptions={{
-                            buttonList: buttonList.complex,
-                            height: 500,
-                            value: formik.values.desc,
-                            font: ["Josefin Sans"],
-                          }}
-                        />
-                      )}
+
+
+
                       <h6 className="mt-4">Kết quả chẩn đoán</h6>
                       <div className="mb-4  button-group">
                         <div
-                          className={`button-check ${
-                            formik.values.isTrue ? "isCheck" : ""
-                          }`}
+                          className={`button-check ${formik.values.isTrue ? "isCheck" : ""
+                            }`}
                           onClick={() => formik.setFieldValue("isTrue", true)}
                         >
                           {" "}
                           Đúng
                         </div>
                         <div
-                          className={`button-check ${
-                            formik.values.isTrue ===false ? "isCheck" : ""
-                          }`}
+                          className={`button-check ${formik.values.isTrue === false ? "isCheck" : ""
+                            }`}
                           onClick={() => formik.setFieldValue("isTrue", false)}
                         >
                           Sai
@@ -223,14 +134,48 @@ const EditDiagnoseMain = () => {
 
                       <div className="mb-4">
                         <select
+                          id="situationSelect"
                           className="form-control mt-3"
-                          name="situationId"
-                          value={formik.values.situationId}
-                          onChange={formik.handleChange}
+                          name="situation"
+                          value={formik.values.situation}
+                          onChange={handleChangeSituation}
+                          defaultValue="formik.values.situation"
                         >
-                          {listQuestion?.map((item) => (
-                            <option value={item._id}>{item.name}</option>
-                          ))}
+                          <option value="">Tình huống</option>
+                          {questionCd?.length === undefined ? (
+                            <>
+                              <option value={questionCd?._id}>
+                                {questionCd?.name}
+                              </option>
+                            </>
+                          ) : (
+                            questionCd?.map((item) => (
+                              <option value={item?._id}>{item?.name}</option>
+                            ))
+                          )}
+                        </select>
+                      </div>
+                      <div className="mb-4">
+                        <select
+                          className="form-control mt-3"
+                          name="diagnose"
+                          value={formik.values.preliminary}
+                          onChange={handleChangePriliminary}
+                        >
+                          <option value="">Chẩn đoán sơ bộ</option>
+                          {prebysituationid?.length === undefined ? (
+                            <>
+                              <option value={prebysituationid?._id}>
+                                {prebysituationid?.name}
+                              </option>
+                            </>
+                          ) : (
+                            prebysituationid?.map((item) => (
+                              <option value={item?._id} key={item._id}>
+                                {item?.name}
+                              </option>
+                            ))
+                          )}
                         </select>
                       </div>
                     </>

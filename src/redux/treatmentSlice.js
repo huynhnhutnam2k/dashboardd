@@ -135,9 +135,9 @@ export const fetchOneTreatment = createAsyncThunk(
 
 export const createTreatment = createAsyncThunk(
   "treatment/create",
-  async ({ treatment, token }) => {
+  async ({ body, token }) => {
     try {
-      const res = await axios.post(`${URL_API}`, treatment, {
+      const res = await axios.post(`${URL_API}`, body, {
         headers: {
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
