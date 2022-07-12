@@ -25,7 +25,8 @@ const ToastObjects = {
 };
 const AddDiagnoseMain = () => {
   const { userInfo, situation } = useSelector((state) => state.auth);
-  const { prebysituationid, addSuccess, error } = useSelector((state) => state.pre)
+  const { prebysituationid } = useSelector((state) => state.pre)
+  const { addSuccess, error } = useSelector((state) => state.diagnose)
   const { listQuestion: questionCd } = useSelector((state) => state.question)
   const navigate = useNavigate();
   const dispatch = useDispatch();
