@@ -356,8 +356,8 @@ function MarksManagementF() {
         Header: "User",
         columns: [
           {
-            Header: "Userd",
-            accessor: "_id",
+            Header: "username",
+            accessor: "userId.username",
             filter: "fuzzyText",
           },
           {
