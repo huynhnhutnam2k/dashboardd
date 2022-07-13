@@ -16,6 +16,7 @@ const ToastObjects = {
   pauseOnHouver: false,
   autoClose: 2000,
 };
+
 const EditDiagnoseMain = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
@@ -24,6 +25,7 @@ const EditDiagnoseMain = () => {
   const { diagnose, pending, updateSuccess, error } = useSelector(
     (state) => state.diagnose
   );
+  const token = userInfo?.token
   const { prebysituationid } = useSelector((state) => state.pre)
   const formik = useFormik({
     initialValues: {
@@ -59,12 +61,15 @@ const EditDiagnoseMain = () => {
   const handleChangePriliminary = async (e) => {
     formik.setFieldValue("preliminary", e.target.value)
   }
-  useEffect(async () => {
-    await dispatch(getPreliminariesBySituation(id))
-  }, [dispatch])
+  useEffect(() => {
+    const apiCall = async () => {
+      await dispatch(getPreliminariesBySituation(diagnose?.preliminary?.situation?._id))
+    }
+    apiCall()
+  }, [diagnose?.preliminary?.situation?._id, dispatch])
+
   useLayoutEffect(() => {
     dispatch(getADiag(id));
-    const token = userInfo?.token;
     dispatch(getByRole(token));
     dispatch(getAllQuestion());
     query && dispatch(getPreliminariesBySituation(query));
@@ -72,8 +77,11 @@ const EditDiagnoseMain = () => {
     if (updateSuccess) {
       toast.success("Cập nhật thành công", ToastObjects);
       dispatch(reset());
+    } if (error) {
+      toast.error("Cập nhật thất bại", ToastObjects);
+      dispatch(reset());
     }
-  }, [dispatch, updateSuccess, error, query]);
+  }, [dispatch, updateSuccess, error, query, token, id]);
 
   console.log(formik.values.preliminary, prebysituationid)
   return (
@@ -85,7 +93,7 @@ const EditDiagnoseMain = () => {
             <Link to="/diagnose" className="btn btn-danger text-white">
               Go to products
             </Link>
-            <h2 className="content-title">Cập nhật chẩn đoán cuối cùng</h2>
+            <h2 className="content-title">Cập nhật chẩn đoán xác định</h2>
             <div>
               <button type="submit" className="btn btn-primary">
                 Cập nhật
@@ -110,8 +118,6 @@ const EditDiagnoseMain = () => {
                           onChange={formik.handleChange}
                         ></input>
                       </div>
-
-
 
                       <h6 className="mt-4">Kết quả chẩn đoán</h6>
                       <div className="mb-4  button-group">
@@ -141,7 +147,6 @@ const EditDiagnoseMain = () => {
                           onChange={handleChangeSituation}
                           defaultValue="formik.values.situation"
                         >
-                          <option value="">Tình huống</option>
                           {questionCd?.length === undefined ? (
                             <>
                               <option value={questionCd?._id}>
@@ -161,8 +166,8 @@ const EditDiagnoseMain = () => {
                           name="diagnose"
                           value={formik.values.preliminary}
                           onChange={handleChangePriliminary}
+                          defaultValue="formik.values.preliminary"
                         >
-                          <option value="">Chẩn đoán sơ bộ</option>
                           {prebysituationid?.length === undefined ? (
                             <>
                               <option value={prebysituationid?._id}>

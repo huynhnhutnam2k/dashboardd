@@ -22,18 +22,18 @@ const Header = () => {
       }
     });
   }, []);
-  const {userInfo} = useSelector(state => state.auth)
+  const { userInfo } = useSelector(state => state.auth)
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  useEffect(()=> {  
-    if(!userInfo){
+  useEffect(() => {
+    if (!userInfo) {
       navigate('/login')
     }
-  },[dispatch])
+  }, [dispatch, userInfo, navigate])
   const handleLogout = () => {
-    if(userInfo.token){
-      const {token, _id:id} = userInfo
-      dispatch(logOut({token, id}))
+    if (userInfo.token) {
+      const { token, _id: id } = userInfo
+      dispatch(logOut({ token, id }))
     }
   }
   return (

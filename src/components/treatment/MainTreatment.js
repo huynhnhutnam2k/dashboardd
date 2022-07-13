@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Table from "@mui/material/Table";
@@ -44,9 +44,8 @@ const ToastObjects = {
 const MainTreatment = () => {
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const { listTreatment, pending, error, deleteSuccess, page, maxPage } =
+  const { listTreatment, pending, deleteSuccess, page, maxPage } =
     useSelector((state) => state.treatment);
   const { userInfo } = useSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -203,7 +202,7 @@ const MainTreatment = () => {
             )}
             <nav className="float-end mt-4" aria-label="Page navigation">
               <ul className="pagination">
-                <li className={`page-item ${page == 1 ? "disabled" : ""} `}>
+                <li className={`page-item ${page === 1 ? "disabled" : ""} `}>
                   <Link
                     className="page-link"
                     to="#"

@@ -1,9 +1,8 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect } from "react";
 import Toast from "../LoadingError/Toast";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { toast } from "react-toastify";
-import Message from "../LoadingError/Error";
 import Loading from "../LoadingError/Loading";
 import * as yup from "yup";
 import { useFormik } from "formik";
@@ -11,13 +10,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase";
 import {
-  getACd,
   getAQuestion,
   reset,
   updateQuestion,
 } from "../../redux/questionSlice";
 import SunEditor, { buttonList } from "suneditor-react";
 import { getByRole } from "../../redux/authSlice";
+import { departFetch } from "../../redux/departmentSlice";
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -26,9 +25,9 @@ const ToastObjects = {
 };
 const EditProductMain = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { userInfo } = useSelector((state) => state.auth);
   const { id } = useParams();
+  const token = userInfo?.token;
   // const [file, setFile] = useState('')
   // const handleFileInputChange = (e) => {
   //   const file = e.target.files[0];
@@ -44,27 +43,24 @@ const EditProductMain = () => {
   const { question, pending, updateSuccess } = useSelector(
     (state) => state.question
   );
-  const { department } = useSelector((state) => state.auth);
-  const [editDesc, setEditDesc] = useState(false);
+  const { listDepartment } = useSelector((state) => state.department);
   useLayoutEffect(() => {
     dispatch(getAQuestion(id));
-    dispatch(getByRole(userInfo.token));
-
+    dispatch(getByRole(token));
+    dispatch(departFetch(token))
     if (updateSuccess) {
       toast.success("Cập nhật tình huống thành công!!!", ToastObjects);
       dispatch(reset());
       dispatch(getAQuestion(id))
     }
-  }, [dispatch, updateSuccess]);
-  const [desc, setDesc] = useState(question?.desc);
-  console.log(question);
+  }, [dispatch, updateSuccess, id, token]);
   const formik = useFormik({
     initialValues: {
-      desc: question?.desc,
-      name: question?.name,
-      departmentId: question?.departmentId?._id,
-      isFinish:question?.isFinish,
-      isExam: question?.isExam
+      desc: question?.desc || "",
+      name: question?.name || "",
+      departmentId: question?.departmentId?._id || "",
+      isFinish: question?.isFinish || false,
+      isExam: question?.isExam || false,
     },
     validationSchema: yup.object({
       name: yup.string().required("required"),
@@ -73,44 +69,34 @@ const EditProductMain = () => {
     enableReinitialize: true,
     onSubmit: (values) => {
       let body;
-      if (!editDesc) {
-        body = {
-          name: values.name,
-          desc: values.desc,
-          departmentId: values.departmentId?._id,
-          isFinish: values.isFinish,
-          isExam:values.isExam
-        };
-      } else {
-        body = {
-          name: values.name,
-          desc: desc,
-          departmentId: values.departmentId?._id,
-          isFinish: values.isFinish,
-          isExam:values.isExam
-        };
+      body = {
+        name: values.name,
+        desc: values.desc,
+        departmentId: values.departmentId,
+        isFinish: values.isFinish,
+        isExam: values.isExam,
       }
-
-      setEditDesc(false);
+      console.log(body)
       const token = userInfo?.token;
       dispatch(updateQuestion({ body, token, id }));
       // console.log(body);
     },
   });
   const handleChangeDesc = (content) => {
-    setDesc(content);
+    formik.setFieldValue("desc", content)
   };
   const handleImageUploadBefore = (files, info, uploadHandler) => {
     /** @type {any} */
     const metadata = {
       contentType: 'image/jpeg'
-    };  
+    };
     const storageRef = ref(storage, 'images/' + new Date());
-    const uploadTask = uploadBytesResumable(storageRef, files[0], metadata);  
+    const uploadTask = uploadBytesResumable(storageRef, files[0], metadata);
     uploadTask.on('state_changed',
       (snapshot) => {
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         console.log('Upload is ' + progress + '% done');
+        // eslint-disable-next-line default-case
         switch (snapshot.state) {
           case 'paused':
             console.log('Upload is paused');
@@ -119,31 +105,31 @@ const EditProductMain = () => {
             console.log('Upload is running');
             break;
         }
-      }, 
+      },
       (error) => {
+        // eslint-disable-next-line default-case
         switch (error.code) {
           case 'storage/unauthorized':
-            break;
             break;
           case 'storage/unknown':
             break;
         }
-      }, 
+      },
       () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {        
-                const response = {
-                  result: [
-                    {
-                      url: downloadURL,
-                      name: files[0].name,
-                      size: files[0].size,
-                    },
-                  ],
-                }
-                uploadHandler(response)        
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          const response = {
+            result: [
+              {
+                url: downloadURL,
+                name: files[0].name,
+                size: files[0].size,
+              },
+            ],
+          }
+          uploadHandler(response)
         });
       }
-    );  
+    );
   }
 
   return (
@@ -172,44 +158,18 @@ const EditProductMain = () => {
                   ) : (
                     <>
                       <h6>Mô tả</h6>
-                      <div className="mb-4">
-                        <div
-                          dangerouslySetInnerHTML={{
-                            __html: question?.desc,
-                          }}
-                        />
-                      </div>
-                      <h6>Bạn có muốn sửa mô tả không?</h6>
-                      <div className="button-group">
-                        <div
-                          className={`button-check ${
-                            editDesc === false ? "isCheck" : ""
-                          }`}
-                          onClick={() => setEditDesc(false)}
-                        >
-                          Không
-                        </div>
-                        <div
-                          className={`button-check ${
-                            editDesc ? "isCheck" : ""
-                          }`}
-                          onClick={() => setEditDesc(true)}
-                        >
-                          Có
-                        </div>
-                      </div>
-                      {editDesc && (
-                        <SunEditor
-                          className="mb-4"
-                          onChange={handleChangeDesc}
-                          onImageUploadBefore={handleImageUploadBefore}
-                          setOptions={{
-                            buttonList: buttonList.complex,
-                            height: 500,
-                            value: formik.values.desc,
-                          }}
-                        />
-                      )}
+                      <SunEditor
+                        className="mb-4"
+                        onChange={handleChangeDesc}
+                        onImageUploadBefore={handleImageUploadBefore}
+                        setContents={formik.values.desc}
+                        setOptions={{
+                          buttonList: buttonList.complex,
+                          height: 500,
+                          value: formik.values.desc,
+                        }}
+                      />
+
                       <div className="mb-4 mt-4">
                         <label className="form-label">Tên</label>
                         <input
@@ -233,10 +193,10 @@ const EditProductMain = () => {
                           <option value={question?.departmentId?._id}>
                             {question?.departmentId?.name}
                           </option>
-                          {department?.map(
+                          {listDepartment?.map(
                             (item) =>
                               item?._id !== question?.departmentId?._id && (
-                                <option value={item._id}>{item.name}</option>
+                                <option value={item._id} key={item._id}>{item.name}</option>
                               )
                           )}
                         </select>
@@ -244,18 +204,15 @@ const EditProductMain = () => {
                       <h6 className="mt-4">Câu Hỏi Đã Hoàn Thành</h6>
                       <div className="mb-4  button-group">
                         <div
-                          className={`button-check ${
-                            formik.values.isFinish ? "isCheck" : ""
-                          }`}
+                          className={`button-check ${formik.values.isFinish && "isCheck"}`}
                           onClick={() => formik.setFieldValue("isFinish", true)}
                         >
                           {" "}
                           Hoàn Thành
                         </div>
                         <div
-                          className={`button-check ${
-                            formik.values.isFinish === false ? "isCheck" : ""
-                          }`}
+                          className={`button-check ${!formik.values.isFinish && "isCheck"
+                            }`}
                           onClick={() => formik.setFieldValue("isFinish", false)}
                         >
                           Chưa Hoàn Thành
@@ -264,18 +221,16 @@ const EditProductMain = () => {
                       <h6 className="mt-4">Câu Hỏi Kiểm Tra</h6>
                       <div className="mb-4  button-group">
                         <div
-                          className={`button-check ${
-                            formik.values.isExam ? "isCheck" : ""
-                          }`}
+                          className={`button-check ${formik.values.isExam ? "isCheck" : ""
+                            }`}
                           onClick={() => formik.setFieldValue("isExam", true)}
                         >
                           {" "}
                           Là Câu Hỏi Kiểm Tra
                         </div>
                         <div
-                          className={`button-check ${
-                            formik.values.isExam === false ? "isCheck" : ""
-                          }`}
+                          className={`button-check ${!formik.values.isExam && "isCheck"
+                            }`}
                           onClick={() => formik.setFieldValue("isExam", false)}
                         >
                           Không Phải Câu Hỏi Kiểm Tra

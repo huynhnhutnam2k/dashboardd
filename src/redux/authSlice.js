@@ -1,13 +1,10 @@
-import { createAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import { Navigate } from "react-router-dom";
 import { URL } from "./url";
 const URL_API = URL;
-console.log("URL", URL_API)
 export const userLocalStorage = JSON.parse(localStorage.getItem("user"))
   ? JSON.parse(localStorage.getItem("user"))
   : null;
-console.log(userLocalStorage)
 export const authSlice = createSlice({
   name: "auth",
   initialState: {
@@ -162,19 +159,20 @@ export const addUser = createAsyncThunk(
   "auth/register",
   async ({ token, user }) => {
     try {
+      console.log(token, user)
       const res = await axios.post(`${URL_API}/user/register`, user, {
         headers: {
           token: `Bearer ${token}`,
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Headers":
-            "origin, x-requested-with, content-type",
-          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
+          // "Access-Control-Allow-Origin": "*",
+          // "Access-Control-Allow-Headers":
+          //   "origin, x-requested-with, content-type",
+          // "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTIONS",
         },
       });
       return res?.data;
     } catch (error) {
-      console.log(error.response.data.message);
+      console.log(error.response.data);
     }
   }
 );

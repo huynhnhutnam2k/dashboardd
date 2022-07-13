@@ -1,6 +1,5 @@
 import Sidebar from "../components/sidebar";
 import Header from "../components/Header";
-import EditQnAMain from "../components/qnas/EditQnAMain";
 import EditDepartMain from "../components/deparment/EditDepartMain";
 
 const DepartEditScreen = () => {
@@ -11,7 +10,7 @@ const DepartEditScreen = () => {
       <Sidebar />
       <main className="main-wrap">
         <Header />
-        <EditDepartMain  />
+        <EditDepartMain />
       </main>
     </>
   );

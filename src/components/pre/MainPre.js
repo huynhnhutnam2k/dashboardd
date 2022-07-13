@@ -112,7 +112,7 @@ const MainPre = () => {
                       <TableRow>
                         <TableCell>Name</TableCell>
                         <TableCell align="center">Tên tình huống</TableCell>
-                        <TableCell align="center">Số cách điều trị</TableCell>
+                        <TableCell align="center">Số chuẩn đoán xác định</TableCell>
                         <TableCell align="center">Đúng?</TableCell>
                         <TableCell align="center">Created At</TableCell>
                         <TableCell align="center"></TableCell>
@@ -133,7 +133,7 @@ const MainPre = () => {
                             {row.situation?.name}
                           </TableCell>
                           <TableCell align="center">
-                            {row.treatment?.length}
+                            {row.diagnoses?.length}
                           </TableCell>
                           {row.isTrue ? (
                             <TableCell align="center">Đúng</TableCell>

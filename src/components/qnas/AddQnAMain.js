@@ -1,20 +1,18 @@
+/* eslint-disable default-case */
 import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as yup from "yup";
-import Message from "../LoadingError/Error";
-import Loading from "../LoadingError/Loading";
 import Toast from "../LoadingError/Toast";
-import { useNavigate } from "react-router-dom";
 import { addQuestion, reset } from "../../redux/questionSlice";
 import { getByRole } from "../../redux/authSlice";
 import SunEditor, { buttonList } from "suneditor-react";
 import "suneditor/dist/css/suneditor.min.css";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase";
-import {departFetch} from "../../redux/departmentSlice"
+import { departFetch } from "../../redux/departmentSlice"
 
 const ToastObjects = {
   pauseOnFocusLoss: false,
@@ -24,13 +22,13 @@ const ToastObjects = {
 };
 const AddQnAMain = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
-  const { listDepartment:departmentCd } = useSelector((state) => state.department);
-  const { pending, addSuccess } = useSelector((state) => state.question);
-  const navigate = useNavigate();
+  const { listDepartment: departmentCd } = useSelector((state) => state.department);
+  const { addSuccess } = useSelector((state) => state.question);
+
+  const token = userInfo?.token;
   const dispatch = useDispatch();
   useEffect(() => {
-    if (userInfo?.token) {
-      const token = userInfo?.token;
+    if (token) {
       dispatch(getByRole(token));
       dispatch(departFetch())
     }
@@ -38,10 +36,9 @@ const AddQnAMain = () => {
       toast.success("Thêm mới thành công!!!", ToastObjects);
       dispatch(reset());
     }
-  }, [dispatch, addSuccess]);
-  const [desc, setDesc] = useState(null);
+  }, [dispatch, addSuccess, token]);
   const handleChangeDesc = (content) => {
-    setDesc(content);
+    formik.setFieldValue("desc", content)
   };
   const formik = useFormik({
     initialValues: {
@@ -51,20 +48,20 @@ const AddQnAMain = () => {
     },
     validationSchema: yup.object({
       // desc : yup.string().required(),
-      name: yup.string().required("required"),
-      departmentId: yup.string(),
+      name: yup.string().required("Vui lòng nhâp tên tình huống"),
+      departmentId: yup.string().required("Vui Lòng chọn chuyên khoa"),
+      desc: yup.string().required("Vui lòng nhập chi tiết")
     }),
     onSubmit: (values) => {
       const body = {
         name: values.name,
-        desc: desc,
+        desc: values.desc,
         departmentId: values.departmentId,
       };
-      const token = userInfo?.token;
       dispatch(addQuestion({ body, token }));
       if (addSuccess) {
         toast.success("Thêm mới tình huống thành công!!!", ToastObjects);
-      
+
       }
     },
   });
@@ -75,9 +72,9 @@ const AddQnAMain = () => {
     /** @type {any} */
     const metadata = {
       contentType: 'image/jpeg'
-    };  
+    };
     const storageRef = ref(storage, 'images/' + new Date());
-    const uploadTask = uploadBytesResumable(storageRef, files[0], metadata);  
+    const uploadTask = uploadBytesResumable(storageRef, files[0], metadata);
     uploadTask.on('state_changed',
       (snapshot) => {
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
@@ -90,31 +87,30 @@ const AddQnAMain = () => {
             console.log('Upload is running');
             break;
         }
-      }, 
+      },
       (error) => {
         switch (error.code) {
           case 'storage/unauthorized':
             break;
-            break;
           case 'storage/unknown':
             break;
         }
-      }, 
+      },
       () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {        
-                const response = {
-                  result: [
-                    {
-                      url: downloadURL,
-                      name: files[0].name,
-                      size: files[0].size,
-                    },
-                  ],
-                }
-                uploadHandler(response)        
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          const response = {
+            result: [
+              {
+                url: downloadURL,
+                name: files[0].name,
+                size: files[0].size,
+              },
+            ],
+          }
+          uploadHandler(response)
         });
       }
-    );  
+    );
   }
 
 
@@ -128,14 +124,19 @@ const AddQnAMain = () => {
           disabled={!formik.dirty}
         >
           <div className="content-header">
-            <Link to="/qnas" className="btn btn-danger text-white">
+            <Link to="/qnas" className="btn btn-danger">
               Trở về
             </Link>
             <h2 className="content-title">Thêm tình huống</h2>
+
             <div>
-              <button className="btn btn-primary" type="submit">
-                Thêm
-              </button>
+              <Link to="/add-pre" className="btn btn-next right">
+                Bước tiếp theo
+              </Link>
+              <div>
+                <button className="btn btn-primary" type="submit">
+                  Thêm tình huống
+                </button></div>
             </div>
           </div>
 
@@ -143,14 +144,8 @@ const AddQnAMain = () => {
             <div className="col-xl-12 col-lg-12">
               <div className="card mb-4 shadow-sm">
                 <div className="card-body">
-                  <SunEditor
-                    className="mb-4"
-                    onChange={handleChangeDesc}
-                    onImageUploadBefore={handleImageUploadBefore}
-                    setOptions={{ buttonList: buttonList.complex, height: 500 }}
-                  />
                   <div className="mb-4">
-                    <label className="form-label">Tên</label>
+                    <label className="form-label">Tên tình huống</label>
                     <input
                       placeholder="Nhập vào đây..."
                       className="form-control"
@@ -158,6 +153,8 @@ const AddQnAMain = () => {
                       value={formik.values.name}
                       onChange={formik.handleChange}
                     ></input>
+                    {formik.errors.name && formik.touched.name && (
+                      <p style={{ color: "red" }}>*{formik.errors.name}</p>)}
                   </div>
                   <div className="mb-4">
                     <select
@@ -166,8 +163,8 @@ const AddQnAMain = () => {
                       value={formik.values.departmentId}
                       onChange={formik.handleChange}
                     >
-                      <option value="">Department</option>
-                      
+                      <option value="">Chuyên khoa</option>
+
                       {departmentCd?.length === undefined ? (
                         <option
                           key={departmentCd?._id}
@@ -183,7 +180,20 @@ const AddQnAMain = () => {
                         ))
                       )}
                     </select>
+                    {formik.errors.departmentId && formik.touched.departmentId && (
+                      <p style={{ color: "red" }}>*{formik.errors.departmentId}</p>)}
                   </div>
+                  Chi tiết
+                  {formik.errors.desc && formik.touched.desc && (
+                    <p style={{ color: "red" }}>*{formik.errors.desc}</p>)}
+                  <SunEditor
+                    className="mb-4"
+                    onChange={handleChangeDesc}
+                    onImageUploadBefore={handleImageUploadBefore}
+                    setContents={formik.values.desc}
+                    setOptions={{ buttonList: buttonList.complex, height: 500 }}
+                  />
+
                 </div>
               </div>
             </div>

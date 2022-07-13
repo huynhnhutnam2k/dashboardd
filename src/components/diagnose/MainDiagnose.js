@@ -15,7 +15,7 @@ import Modal from "@mui/material/Modal";
 import Stack from "@mui/material/Stack";
 import momment from "moment";
 import Loading from "../LoadingError/Loading";
-import { allDepartment, departFetch } from "../../redux/departmentSlice";
+//import { allDepartment, departFetch } from "../../redux/departmentSlice";
 import {
   decrementDiagnose,
   delDiagnose,
@@ -23,7 +23,7 @@ import {
   incrementDiagnose,
   getADiag
 } from "../../redux/diagnoseSlice";
-import { decrement, increment } from "../../redux/questionSlice";
+//import { decrement, increment } from "../../redux/questionSlice";
 const style = {
   position: "absolute",
   top: "50%",
@@ -39,7 +39,7 @@ const style = {
 const MainDiagnose = () => {
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
+  //const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const { userInfo } = useSelector((state) => state.auth);
   const { pending, listDiagnose, deleteSuccess, page, maxPage } = useSelector(
@@ -99,7 +99,7 @@ const MainDiagnose = () => {
                   <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                       <TableRow>
-                        <TableCell>Chuẩn đoán sau cùng</TableCell>
+                        <TableCell>Chuẩn đoán xác định</TableCell>
                         <TableCell align="center">Tên tình huống</TableCell>
                         <TableCell align="center">Tên Chẩn đoán sơ bộ</TableCell>
                         <TableCell align="center">Số cách điều trị</TableCell>
@@ -171,7 +171,7 @@ const MainDiagnose = () => {
             )}
             <nav className="float-end mt-4" aria-label="Page navigation">
               <ul className="pagination">
-                <li className={`page-item ${page == 1 ? "disabled" : ""} `}>
+                <li className={`page-item ${page === 1 ? "disabled" : ""} `}>
                   <Link
                     className="page-link"
                     to="#"

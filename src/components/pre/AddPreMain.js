@@ -13,6 +13,7 @@ import "suneditor/dist/css/suneditor.min.css";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase";
 import { addPre } from "../../redux/preliminarySlice";
+import * as yup from "yup";
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -23,6 +24,7 @@ const AddPreMain = () => {
   const { userInfo, situation } = useSelector((state) => state.auth);
   const { addSuccess, error } = useSelector((state) => state.pre);
   const dispatch = useDispatch();
+  console.log("add", addSuccess, error)
   useEffect(() => {
     dispatch(getByRole(userInfo?.token));
     if (addSuccess) {
@@ -38,9 +40,8 @@ const AddPreMain = () => {
   // const [file, setFile] = useState("");
   const [isTrue, setIsTrue] = useState(false);
 
-  const [desc, setDesc] = useState(null);
   const handleChangeDesc = (content) => {
-    setDesc(content);
+    formik.setFieldValue("desc", content)
   };
   const formik = useFormik({
     initialValues: {
@@ -49,18 +50,22 @@ const AddPreMain = () => {
       situation: "",
       isTrue: isTrue,
     },
-
-    onSubmit: (values) => {
+    validationSchema: yup.object({
+      name: yup.string().required("Vui lòng nhập tên chuẩn đoán sơ bộ"),
+      desc: yup.string().required("Vui lòng nhập chi tiết tình huống"),
+      situation: yup.string().required("vui lòng chọn tình huống"),
+    }),
+    onSubmit: (values, { resetForm }) => {
       const pre = {
         name: values.name,
-        desc: desc,
+        desc: values.desc,
         situation: values.situation,
         isTrue: isTrue,
       };
+      console.log(pre)
       if (userInfo.token) {
         const token = userInfo.token;
-        dispatch(addPre(pre, token));
-        // console.log(pre, token);
+        dispatch(addPre(pre, token)).then(resetForm())
         if (addSuccess) {
           toast.success("Thêm mới thành công!!!", ToastObjects);
         }
@@ -123,14 +128,18 @@ const AddPreMain = () => {
       <section className="content-main" style={{ maxWidth: "1200px" }}>
         <form onSubmit={formik.handleSubmit} encType="multipart/form-data">
           <div className="content-header">
-            <Link to="/department" className="btn btn-danger text-white">
+            <Link to="/premilinary" className="btn btn-danger">
               Trở về
             </Link>
-            <h2 className="content-title">Thêm chẩn đoán sơ bộ</h2>
+            <h2 className="content-title">Thêm tình huống</h2>
             <div>
-              <button className="btn btn-primary" type="submit">
-                Thêm
-              </button>
+              <Link to="/add-diagnose" className="btn btn-next right">
+                Bước tiếp theo
+              </Link>
+              <div>
+                <button className="btn btn-primary" type="submit">
+                  Thêm tình huống
+                </button></div>
             </div>
           </div>
 
@@ -149,13 +158,9 @@ const AddPreMain = () => {
                       // required
                       onChange={formik.handleChange}
                     ></input>
+                    {formik.errors.name && formik.touched.name && (
+                      <p style={{ color: "red" }}>*{formik.errors.name}</p>)}
                   </div>
-                  <SunEditor
-                    className="mb-4"
-                    onChange={handleChangeDesc}
-                    onImageUploadBefore={handleImageUploadBefore}
-                    setOptions={{ buttonList: buttonList.complex, height: 500 }}
-                  />
                   <div className="mb-4">
                     <select
                       className="form-control mt-3"
@@ -176,7 +181,19 @@ const AddPreMain = () => {
                         ))
                       )}
                     </select>
+                    {formik.errors.situation && formik.touched.situation && (
+                      <p style={{ color: "red" }}>*{formik.errors.situation}</p>)}
                   </div>
+                  Chi tiết
+                  {formik.errors.desc && formik.touched.desc && (
+                    <p style={{ color: "red" }}>*{formik.errors.desc}</p>)}
+                  <SunEditor
+                    className="mb-4"
+                    onChange={handleChangeDesc}
+                    onImageUploadBefore={handleImageUploadBefore}
+                    setContents={formik.values.desc}
+                    setOptions={{ buttonList: buttonList.complex, height: 500 }}
+                  />
                   <div className="mb-4">
                     <label className="form-label">Đúng</label>
                     <input

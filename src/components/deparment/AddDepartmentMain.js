@@ -1,16 +1,12 @@
 import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as yup from "yup";
-import Message from "../LoadingError/Error";
-import Loading from "../LoadingError/Loading";
 import Toast from "../LoadingError/Toast";
-import { useNavigate } from "react-router-dom";
 import { addDepart } from "../../redux/departmentSlice";
-import { unwrapResult } from "@reduxjs/toolkit";
-import { getACd, reset } from "../../redux/questionSlice";
+import { reset } from "../../redux/questionSlice";
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -20,7 +16,7 @@ const ToastObjects = {
 const AddDepartmentMain = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const { pending, addSuccess } = useSelector((state) => state.department);
+  const { addSuccess } = useSelector((state) => state.department);
   useEffect(() => {
     if (addSuccess) {
       toast.success("Thêm mới thành công!!!", ToastObjects);
@@ -33,16 +29,16 @@ const AddDepartmentMain = () => {
       name: "",
     },
     validationSchema: yup.object({
-      name: yup.string().required("required"),
+      name: yup.string().required("Nhập tên chuyên khoa"),
     }),
-    onSubmit: (values) => {
+    onSubmit: (values, { resetForm }) => {
       const body = {
         name: values.name,
       };
       if (userInfo.token) {
         const token = userInfo.token;
         // console.log(body, token)
-        dispatch(addDepart({ body, token }));
+        dispatch(addDepart({ body, token })).then(resetForm());
       }
     },
   });
@@ -82,6 +78,8 @@ const AddDepartmentMain = () => {
                       // required
                       onChange={formik.handleChange}
                     ></input>
+                    {formik.errors.name && formik.touched.name && (
+                      <p style={{ color: "red" }}>*{formik.errors.name}</p>)}
                   </div>
                 </div>
               </div>

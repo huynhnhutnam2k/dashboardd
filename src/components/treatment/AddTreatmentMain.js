@@ -1,16 +1,12 @@
+/* eslint-disable default-case */
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as yup from "yup";
-import Message from "../LoadingError/Error";
-import Loading from "../LoadingError/Loading";
 import Toast from "../LoadingError/Toast";
-import { useNavigate } from "react-router-dom";
-import { addDepart } from "../../redux/departmentSlice";
-import { unwrapResult } from "@reduxjs/toolkit";
-import { getACd, getAllQuestion, reset } from "../../redux/questionSlice";
+import { reset } from "../../redux/questionSlice";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase";
 import {
@@ -36,16 +32,14 @@ const AddTreatmentMain = () => {
   const { diagnosesByPreliminary } = useSelector((state) => state.diagnose);
   const { addSuccess, error } = useSelector((state) => state.treatment);
   const { prebysituationid } = useSelector((state) => state.pre)
-  const [queryPreliminary, setQueryPreliminary] = useState("");
-  const [queryDiagnose, setQueryDiagnose] = useState("")
-  // const [desc, setDesc] = useState("")
-  const navigate = useNavigate();
+  const [queryPreliminary, setQueryPreliminary] = useState();
+  const [queryDiagnose, setQueryDiagnose] = useState()
   const dispatch = useDispatch();
+  const token = userInfo?.token;
   useEffect(() => {
-    const token = userInfo?.token;
     dispatch(getByRole(token));
-    dispatch(getPreliminariesBySituation(queryPreliminary));
-    dispatch(getDiagnosesByPreliminary(queryDiagnose))
+    queryPreliminary && dispatch(getPreliminariesBySituation(queryPreliminary));
+    queryDiagnose && dispatch(getDiagnosesByPreliminary(queryDiagnose))
     if (addSuccess) {
       toast.success("Them moi thanh cong", ToastObjects);
       dispatch(reset());
@@ -54,10 +48,9 @@ const AddTreatmentMain = () => {
       toast.error("Them moi that bai", ToastObjects);
       dispatch(reset());
     }
-  }, [dispatch, queryPreliminary, addSuccess, error, queryDiagnose]);
-  const [desc, setDesc] = useState(null);
+  }, [dispatch, queryPreliminary, addSuccess, error, queryDiagnose, token]);
   const handleChangeDesc = (content) => {
-    setDesc(content);
+    formik.setFieldValue("desc", content);
   };
   const formik = useFormik({
     initialValues: {
@@ -70,13 +63,16 @@ const AddTreatmentMain = () => {
       diagnose: ""
     },
     validationSchema: yup.object({
-      // desc : yup.string().required(),
-      name: yup.string().required("required"),
+      desc: yup.string().required("Vui lòng nhập mô tả"),
+      name: yup.string().required("Vui lòng nhập tên cách điều trị"),
+      situation: yup.string().required("Vui lòng chọn tình huống"),
+      preliminary: yup.string().required("vui lòng chọn chẩn đoán sơ bộ"),
+      diagnose: yup.string().required("Vui lòng chon chẩn đoán cuối cùng")
     }),
-    onSubmit: (values) => {
+    onSubmit: (values, { resetForm }) => {
       const body = {
         name: values.name,
-        desc: desc,
+        desc: values.desc,
         note: values.note,
         isTrue: values.isTrue,
         situation: values.situation,
@@ -86,7 +82,8 @@ const AddTreatmentMain = () => {
       };
       const token = userInfo?.token;
       console.log(body);
-      dispatch(createTreatment({ body, token }));
+      dispatch(createTreatment({ body, token })).then(resetForm());
+
       if (addSuccess) {
         toast.success("Thêm mới tình huống thành công!!!", ToastObjects);
 
@@ -125,6 +122,7 @@ const AddTreatmentMain = () => {
       (snapshot) => {
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         console.log('Upload is ' + progress + '% done');
+        // eslint-disable-next-line default-case
         switch (snapshot.state) {
           case 'paused':
             console.log('Upload is paused');
@@ -137,7 +135,6 @@ const AddTreatmentMain = () => {
       (error) => {
         switch (error.code) {
           case 'storage/unauthorized':
-            break;
             break;
           case 'storage/unknown':
             break;
@@ -196,15 +193,11 @@ const AddTreatmentMain = () => {
                       // required
                       onChange={formik.handleChange}
                     ></textarea>
+                    {formik.errors.name && formik.touched.name && (
+                      <p style={{ color: "red" }}>*{formik.errors.name}</p>)}
                   </div>
 
-                  <h6>Mô tả</h6>
-                  <SunEditor
-                    className="mb-4 "
-                    onChange={handleChangeDesc}
-                    onImageUploadBefore={handleImageUploadBefore}
-                    setOptions={{ buttonList: buttonList.complex, height: 500 }}
-                  />
+
                   <h6 className="mt-4">Kết quả điều trị</h6>
                   <div className="mb-4  button-group">
                     <div
@@ -254,10 +247,12 @@ const AddTreatmentMain = () => {
                         </>
                       ) : (
                         questionCd?.map((item) => (
-                          <option value={item?._id}>{item?.name}</option>
+                          <option value={item?._id} key={item._id}>{item?.name}</option>
                         ))
                       )}
                     </select>
+                    {formik.errors.situation && formik.touched.situation && (
+                      <p style={{ color: "red" }}>*{formik.errors.situation}</p>)}
                   </div>
                   <div className="mb-4">
                     <select
@@ -281,6 +276,8 @@ const AddTreatmentMain = () => {
                         ))
                       )}
                     </select>
+                    {formik.errors.preliminary && formik.touched.preliminary && (
+                      <p style={{ color: "red" }}>*{formik.errors.preliminary}</p>)}
                   </div>
                   <div className="mb-4">
                     <select
@@ -289,7 +286,7 @@ const AddTreatmentMain = () => {
                       value={formik.values.diagnose}
                       onChange={handleChangeDiagnose}
                     >
-                      <option value="">Chẩn đoán lâm sàng</option>
+                      <option value="">Chẩn đoán xác định</option>
                       {diagnosesByPreliminary?.length === undefined ? (
                         <>
                           <option value={diagnosesByPreliminary?._id}>
@@ -303,7 +300,19 @@ const AddTreatmentMain = () => {
                       ))
                       )}
                     </select>
+                    {formik.errors.diagnose && formik.touched.diagnose && (
+                      <p style={{ color: "red" }}>*{formik.errors.diagnose}</p>)}
                   </div>
+                  <h6>Mô tả</h6>
+                  {formik.errors.desc && formik.touched.desc && (
+                    <p style={{ color: "red" }}>*{formik.errors.desc}</p>)}
+                  <SunEditor
+                    className="mb-4 "
+                    onChange={handleChangeDesc}
+                    onImageUploadBefore={handleImageUploadBefore}
+                    setContents={formik.values.desc}
+                    setOptions={{ buttonList: buttonList.complex, height: 500 }}
+                  />
                 </div>
               </div>
             </div>

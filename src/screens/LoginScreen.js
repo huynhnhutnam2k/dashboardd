@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Message from "./../components/LoadingError/Error";
 import Loading from "./../components/LoadingError/Loading";
-import Toast from "./../components/LoadingError/Toast";
-import {useFormik} from 'formik'
+import { useFormik } from 'formik'
 import * as yup from 'yup'
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -11,9 +10,9 @@ const Login = () => {
   window.scrollTo(0, 0);
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const {loading: pending, error, msg } = useSelector(state => state.auth)
+  const { loading: pending, error, msg } = useSelector(state => state.auth)
   const formik = useFormik({
-    initialValues:{
+    initialValues: {
       email: "",
       password: ""
     },
@@ -21,18 +20,18 @@ const Login = () => {
       email: yup.string().email().required("required"),
       password: yup.string().required("required")
     }),
-    onSubmit: (values)=> {
+    onSubmit: (values) => {
       const user = {
         email: values.email,
         password: values.password
       }
       // loginRequest(dispatch,navigate, user)
-      dispatch(logIn({user, navigate}))
+      dispatch(logIn({ user, navigate }))
     }
   })
   return (
     <>
-      
+
       <div
         className="card shadow mx-auto"
         style={{ maxWidth: "380px", marginTop: "100px" }}

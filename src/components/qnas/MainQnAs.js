@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Table from "@mui/material/Table";
@@ -19,7 +19,6 @@ import {
   decrement,
   deleteQuestion,
   getAllQuestion,
-  getPage,
   increment,
   reset,
 } from "../../redux/questionSlice";
@@ -49,22 +48,21 @@ const ToastObjects = {
 const MainQnAs = () => {
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const { listQuestion, pending, error, deleteSuccess, page, maxPage } =
+  const { listQuestion, pending, deleteSuccess, page, maxPage } =
     useSelector((state) => state.question);
-  const { situation } = useSelector((state) => state.auth);
   const { userInfo } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const [idQuestion, setIdQuestion] = useState("");
+  const token = userInfo?.token
   useEffect(() => {
     dispatch(getAllQuestion());
-    dispatch(getByRole(userInfo?.token));
+    dispatch(getByRole(token));
     if (deleteSuccess) {
       toast.success("Xóa tình huống thành công", ToastObjects);
       dispatch(reset());
     }
-  }, [dispatch, listQuestion?.length, deleteSuccess, page]);
+  }, [dispatch, listQuestion?.length, deleteSuccess, page, token]);
   console.log(maxPage);
   // console.log(situation);
   const handleChange = (e) => {
@@ -194,7 +192,7 @@ const MainQnAs = () => {
             )}
             <nav className="float-end mt-4" aria-label="Page navigation">
               <ul className="pagination">
-                <li className={`page-item ${page == 1 ? "disabled" : ""} `}>
+                <li className={`page-item ${page === 1 ? "disabled" : ""} `}>
                   <Link
                     className="page-link"
                     to="#"

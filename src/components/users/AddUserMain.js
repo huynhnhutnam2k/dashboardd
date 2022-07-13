@@ -1,15 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-
-import Message from "../LoadingError/Error";
-import Loading from "../LoadingError/Loading";
 import Toast from "../LoadingError/Toast";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser, getByRole } from "../../redux/authSlice";
-import { getACd } from "../../redux/questionSlice";
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -20,15 +16,14 @@ const AddUserMain = () => {
   const { userInfo, addUserSuccess, department } = useSelector(
     (state) => state.auth
   );
-  const { categoriesCd } = useSelector((state) => state.question);
+  const token = userInfo.token
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   useEffect(() => {
-    dispatch(getByRole(userInfo.token));
+    dispatch(getByRole(token));
     if (addUserSuccess) {
       toast.success("Thêm mới thành công!!!", ToastObjects);
     }
-  }, [dispatch, addUserSuccess]);
+  }, [dispatch, addUserSuccess, token]);
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -56,6 +51,7 @@ const AddUserMain = () => {
         isAdmin: values.isAdmin,
       };
       const token = userInfo?.token;
+      console.log(token, user)
       dispatch(addUser({ token, user }));
       if (addUserSuccess) {
         toast.success("Thêm mới thành công!!!", ToastObjects);
@@ -117,7 +113,7 @@ const AddUserMain = () => {
                       rows="4"
                       value={formik.values.password}
                       name="password"
-                      // required
+                      required
                       onChange={formik.handleChange}
                     ></input>
                   </div>
@@ -128,8 +124,8 @@ const AddUserMain = () => {
                       value={formik.values.role}
                       onChange={formik.handleChange}
                     >
-                      <option value="">Role</option>
-                      {department?.length == undefined ? (
+                      <option value="">Chuyên Khoa</option>
+                      {department?.length === undefined ? (
                         <>
                           <option value={department?.name}>
                             {department?.name}

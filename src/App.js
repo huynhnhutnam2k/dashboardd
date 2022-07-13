@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import "./App.css";
 import "./responsive.css";
 import "react-toastify/dist/ReactToastify.css";
@@ -28,7 +28,7 @@ import PreEditScreen from "./screens/PreEditScreen";
 // import TypographyOptions from "@mui/material/styles/createTypography"
 // import { TypographyOptions } from '@mui/material/styles/createTypography';
 // import { createThemem, typography } from "@mui/system";
-import { createTheme, ThemeProvider, typography } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material";
 export const THEME = createTheme({
   typography: {
     "fontFamily": `'Josefin Sans', sans-serif`,

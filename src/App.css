@@ -5,6 +5,7 @@ INCLUDE STYLES AND COMPONENTS
 ===================== */
 /* ================== HELPERS =================== */
 @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;300;500;600;700&display=swap');
+@import url('https://css.gg/arrow-left.css');
 .table thead th {
   color: #adb5bd;
   font-weight: 400;
@@ -28,7 +29,9 @@ a.disabled {
 .btn-primary {
   background-color: #0072BB !important;
   border: 1px solid #0072BB !important;
+  margin-left: 1rem;
 }
+
 .Header-green {
   background-color: #0072BB;
 }
@@ -371,6 +374,24 @@ body.aside-mini .menu-aside .menu-item.has-submenu .menu-link:after {
 }
 .menu-aside .menu-link .text {
   vertical-align: middle;
+}
+.btn-next {
+  background-color: #0072BB !important;
+  border: 1px solid #0072BB !important;
+  color: white;
+  margin-left: 1rem;  
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+.right {
+  border: none;
+  background-color: orange;
+  padding: 10px 48px 8px 24px;
+  border-radius: 4px;
+  color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7.41' height='12' viewBox='0 0 7.41 12'%3E%3Cpath d='M10,6,8.59,7.41,13.17,12,8.59,16.59,10,18l6-6Z' transform='translate(-8.59 -6)' fill='%23fff'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 24px center;
 }
 .menu-aside .menu-link:hover {
   transition: 0.2s linear;

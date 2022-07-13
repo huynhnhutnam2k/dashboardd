@@ -9,7 +9,6 @@ export const getAllDiag = createAsyncThunk(
       const {
         diagnose: { page },
       } = getState();
-      console.log(page);
       const res = await axios.get(`${URL_API}?page=${page}`, {
         headers: {
           "Content-Type": "application/json",
@@ -130,7 +129,6 @@ export const getDiagnosesByPreliminary = createAsyncThunk(
   async (id) => {
     try {
       const response = await axios.get(`${URL_API}/getbypreliminaryid/${id}`);
-      console.log("data", response.data)
       return response.data;
     } catch (error) {
       console.log(error.response.data);
@@ -192,7 +190,6 @@ export const diagnoseSlice = createSlice({
       .addCase(getDiagnosesByPreliminary.fulfilled, (state, action) => {
         state.diagnosesByPreliminary = action.payload;
         state.pending = false;
-        console.log("act", state.diagnosesByPreliminary)
       })
       .addCase(getDiagnosesByPreliminary.rejected, (state) => {
         state.error = true;

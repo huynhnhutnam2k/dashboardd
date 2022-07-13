@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useEffect } from "react";
 import Toast from "../LoadingError/Toast";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -26,56 +26,47 @@ const EditPreMain = () => {
     const { pre, pending, updateSuccess, error } = useSelector(
         (state) => state.pre
     );
-    useLayoutEffect(() => {
+    const token = userInfo?.token;
+    useEffect(() => {
         dispatch(getPre(id));
-        const token = userInfo?.token;
+    }, [dispatch, id])
+
+    useLayoutEffect(() => {
+
         dispatch(getByRole(token));
         dispatch(getAllQuestion());
-        // !editDesc && setDesc(pre?.desc);
         if (updateSuccess) {
             toast.success("Cập nhật thành công", ToastObjects);
             dispatch(reset());
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dispatch, updateSuccess, error]);
-    const [desc, setDesc] = useState(pre?.desc);
+    }, [dispatch, updateSuccess, error, token]);
+    console.log(pre)
     const formik = useFormik({
         initialValues: {
-            name: pre?.name,
-            desc: pre?.desc,
-            isTrue: pre?.isTrue,
-            situationId: pre?.situationId?._id,
+            name: pre?.name || "",
+            desc: pre?.desc || "",
+            isTrue: pre?.isTrue || false,
+            situationId: pre?.situationId?._id || false,
         },
-        validationSchema: yup.object({}),
+        validationSchema: yup.object({
+            name: yup.string().required("Vui lòng nhập tên chẩn đoán"),
+        }),
         enableReinitialize: true,
         onSubmit: (values) => {
             let body;
-
-            if (editDesc === false) {
-                body = {
-                    name: values.name,
-                    desc: values.desc,
-                    isTrue: values.isTrue,
-                    situationId: values.situationId,
-                };
-            } else {
-                body = {
-                    name: values.name,
-                    isTrue: values.isTrue,
-                    desc: desc,
-                    situationId: values.situationId,
-                };
-            }
-
-            const token = userInfo?.token;
-            console.log(id);
+            body = {
+                name: values.name,
+                isTrue: values.isTrue,
+                desc: values.desc,
+                situationId: values.situationId,
+            };
             dispatch(updatePre({ id, body, token }));
             //
         },
     });
-    const [editDesc, setEditDesc] = useState(false);
     const handleChangeDesc = (content) => {
-        setDesc(content);
+        formik.setFieldValue("desc", content);
     };
     const handleImageUploadBefore = (files, info, uploadHandler) => {
         /** @type {any} */
@@ -131,7 +122,7 @@ const EditPreMain = () => {
         <>
             <Toast />
             <section className="content-main" style={{ maxWidth: "1200px" }}>
-                <form onSubmit={formik.handleSubmit} enableReinitialize={true}>
+                <form onSubmit={formik.handleSubmit}>
                     <div className="content-header">
                         <Link to="/preliminary" className="btn btn-danger text-white">
                             Go to products
@@ -160,40 +151,20 @@ const EditPreMain = () => {
                                                     value={formik.values.name}
                                                     onChange={formik.handleChange}
                                                 ></input>
+                                                {formik.errors.name && formik.touched.name && (
+                                                    <p style={{ color: "red" }}>*{formik.errors.name}</p>)}
                                             </div>
                                             <div className="mb-4">
                                                 <label className="form-label">Mô tả</label>
-                                                <div
-                                                    className="form-control"
-                                                    dangerouslySetInnerHTML={{
-                                                        __html: `${formik.values.desc}`,
-                                                    }}
-                                                />
-                                            </div>
-                                            <h6>Bạn có muốn sửa mô tả không?</h6>
-                                            <div className="button-group">
-                                                <div
-                                                    className={`button-check ${editDesc === false ? "isCheck" : ""
-                                                        }`}
-                                                    onClick={() => setEditDesc(false)}
-                                                >
-                                                    Không
-                                                </div>
-                                                <div
-                                                    className={`button-check ${editDesc ? "isCheck" : ""
-                                                        }`}
-                                                    onClick={() => setEditDesc(true)}
-                                                >
-                                                    Có
-                                                </div>
-                                            </div>
-                                            {editDesc && (
+
+
                                                 <SunEditor
                                                     className="mb-4"
                                                     // defaultValue={formik.values.desc}
                                                     // defaultValue="<p>The editor's default value</p>"
                                                     onImageUploadBefore={handleImageUploadBefore}
                                                     onChange={handleChangeDesc}
+                                                    setContents={formik.values.desc}
                                                     setOptions={{
                                                         buttonList: buttonList.complex,
                                                         height: 500,
@@ -201,7 +172,7 @@ const EditPreMain = () => {
                                                         font: ["Josefin Sans"],
                                                     }}
                                                 />
-                                            )}
+                                            </div>
                                             <h6 className="mt-4">Kết quả chẩn đoán</h6>
                                             <div className="mb-4  button-group">
                                                 <div
@@ -229,7 +200,7 @@ const EditPreMain = () => {
                                                     onChange={formik.handleChange}
                                                 >
                                                     {listQuestion?.map((item) => (
-                                                        <option value={item._id}>{item.name}</option>
+                                                        <option value={item._id} key={item._id}>{item.name}</option>
                                                     ))}
                                                 </select>
                                             </div>

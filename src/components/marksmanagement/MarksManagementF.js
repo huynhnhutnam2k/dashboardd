@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 import styled from "styled-components";
 import {
@@ -8,7 +9,6 @@ import {
 } from "react-table";
 // A great library for fuzzy filtering/sorting items
 import { matchSorter } from "match-sorter";
-import { useSelect } from "@mui/base";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { getAllMark } from "../../redux/markSlice";

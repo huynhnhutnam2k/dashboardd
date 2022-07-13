@@ -3,20 +3,13 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import * as yup from "yup";
-import Message from "../LoadingError/Error";
-import Loading from "../LoadingError/Loading";
 import Toast from "../LoadingError/Toast";
-import { useNavigate } from "react-router-dom";
-import { unwrapResult } from "@reduxjs/toolkit";
-import { getACd, getAllQuestion, reset } from "../../redux/questionSlice";
+import { getAllQuestion, reset } from "../../redux/questionSlice";
 import { addDiagnose } from "../../redux/diagnoseSlice";
 import { getByRole } from "../../redux/authSlice";
 import "suneditor/dist/css/suneditor.min.css";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { storage } from "../firebase";
 import { getPreliminariesBySituation } from "../../redux/preliminarySlice"
-import { getDiagnosesByPreliminary } from "../../redux/diagnoseSlice";
+import * as yup from "yup";
 const ToastObjects = {
   pauseOnFocusLoss: false,
   draggable: false,
@@ -24,17 +17,17 @@ const ToastObjects = {
   autoClose: 2000,
 };
 const AddDiagnoseMain = () => {
-  const { userInfo, situation } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => state.auth);
   const { prebysituationid } = useSelector((state) => state.pre)
   const { addSuccess, error } = useSelector((state) => state.diagnose)
   const { listQuestion: questionCd } = useSelector((state) => state.question)
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [query, setQuery] = useState()
+  const token = userInfo?.token
 
   useEffect(() => {
     dispatch(getAllQuestion())
-    dispatch(getByRole(userInfo?.token));
+    dispatch(getByRole(token));
     query && dispatch(getPreliminariesBySituation(query));
     if (addSuccess) {
       toast.success("Them thannh cong", ToastObjects);
@@ -44,11 +37,9 @@ const AddDiagnoseMain = () => {
       toast.error("Them that bai", ToastObjects);
       dispatch(reset());
     }
-  }, [dispatch, addSuccess, error, query]);
-  const [file, setFile] = useState("");
+  }, [token, dispatch, addSuccess, error, query]);
   const [isTrue, setIsTrue] = useState(false);
 
-  const [desc, setDesc] = useState(null);
 
   const handleChangeSituation = async (e) => {
     formik.setFieldValue("situation", e.target.value)
@@ -70,7 +61,11 @@ const AddDiagnoseMain = () => {
       isTrue: isTrue,
       preliminary: ""
     },
-
+    validationSchema: yup.object({
+      name: yup.string().required("Vui lòng nhập tên tình huống"),
+      situation: yup.string().required("Vui lòng chọn tình huống"),
+      preliminary: yup.string().required("Vui lòng chọn chẩn đoán sơ bộ")
+    }),
     onSubmit: (values) => {
       const body = {
         name: values.name,
@@ -105,14 +100,18 @@ const AddDiagnoseMain = () => {
           encType="multipart/form-data"
         >
           <div className="content-header">
-            <Link to="/department" className="btn btn-danger text-white">
+            <Link to="/diagose" className="btn btn-danger">
               Trở về
             </Link>
-            <h2 className="content-title">Thêm chẩn đoán</h2>
+            <h2 className="content-title">Thêm tình huống</h2>
             <div>
-              <button className="btn btn-primary" type="submit">
-                Thêm
-              </button>
+              <Link to="/add-treatment" className="btn btn-next right">
+                Bước tiếp theo
+              </Link>
+              <div>
+                <button className="btn btn-primary" type="submit">
+                  Thêm tình huống
+                </button></div>
             </div>
           </div>
 
@@ -129,8 +128,9 @@ const AddDiagnoseMain = () => {
                       name="name"
                       value={formik.values.name}
                       // required
-                      onChange={formik.handleChange}
-                    ></input>
+                      onChange={formik.handleChange} />
+                    {formik.errors.name && formik.touched.name && (
+                      <p style={{ color: "red" }}>*{formik.errors.name}</p>)}
                   </div>
 
                   <div className="mb-4">
@@ -154,6 +154,8 @@ const AddDiagnoseMain = () => {
                         ))
                       )}
                     </select>
+                    {formik.errors.situation && formik.touched.situation && (
+                      <p style={{ color: "red" }}>*{formik.errors.situation}</p>)}
                   </div>
                   <div className="mb-4">
                     <select
@@ -177,6 +179,8 @@ const AddDiagnoseMain = () => {
                         ))
                       )}
                     </select>
+                    {formik.errors.preliminary && formik.touched.preliminary && (
+                      <p style={{ color: "red" }}>*{formik.errors.preliminary}</p>)}
                   </div>
 
                   <div className="mb-4">
