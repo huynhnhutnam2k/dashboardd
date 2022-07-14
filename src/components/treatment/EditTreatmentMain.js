@@ -196,10 +196,10 @@ const EditTreatmentMain = () => {
             <Link to="/treatment" className="btn btn-danger text-white">
               Trở về
             </Link>
-            <h2 className="content-title">Sửa cách điều trị</h2>
+            <h2 className="content-title">Cập nhật cách điều trị</h2>
             <div>
               <button className="btn btn-primary" type="submit">
-                Thêm
+                Cập nhật
               </button>
             </div>
           </div>

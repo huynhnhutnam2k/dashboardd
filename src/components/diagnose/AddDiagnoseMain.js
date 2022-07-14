@@ -66,7 +66,7 @@ const AddDiagnoseMain = () => {
       situation: yup.string().required("Vui lòng chọn tình huống"),
       preliminary: yup.string().required("Vui lòng chọn chẩn đoán sơ bộ")
     }),
-    onSubmit: (values) => {
+    onSubmit: (values, { resetForm }) => {
       const body = {
         name: values.name,
         situation: values.situation,
@@ -78,7 +78,7 @@ const AddDiagnoseMain = () => {
       if (userInfo.token) {
         const token = userInfo.token;
         console.log(body);
-        dispatch(addDiagnose({ body, token }));
+        dispatch(addDiagnose({ body, token })).then(resetForm());
         if (addSuccess) {
           toast.success("Thêm mới thành công!!!", ToastObjects);
           // dispatch
@@ -103,14 +103,14 @@ const AddDiagnoseMain = () => {
             <Link to="/diagose" className="btn btn-danger">
               Trở về
             </Link>
-            <h2 className="content-title">Thêm tình huống</h2>
+            <h2 className="content-title">Thêm chẩn đoán xác định</h2>
             <div>
               <Link to="/add-treatment" className="btn btn-next right">
                 Bước tiếp theo
               </Link>
               <div>
                 <button className="btn btn-primary" type="submit">
-                  Thêm tình huống
+                  Thêm chẩn đoán
                 </button></div>
             </div>
           </div>

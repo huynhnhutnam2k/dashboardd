@@ -131,14 +131,14 @@ const AddPreMain = () => {
             <Link to="/premilinary" className="btn btn-danger">
               Trở về
             </Link>
-            <h2 className="content-title">Thêm tình huống</h2>
+            <h2 className="content-title">Thêm chẩn đoán sơ bộ</h2>
             <div>
               <Link to="/add-diagnose" className="btn btn-next right">
                 Bước tiếp theo
               </Link>
               <div>
                 <button className="btn btn-primary" type="submit">
-                  Thêm tình huống
+                  Thêm chẩn đoán
                 </button></div>
             </div>
           </div>
