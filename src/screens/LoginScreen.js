@@ -62,7 +62,7 @@ const Login = () => {
             </div>
 
             <div className="mb-4">
-              <button type="submit" className="btn btn-primary w-100">
+              <button type="submit" className="btn btn-primary w-100 login-btn" style={{ marginLeft: "auto" }}>
                 Đăng nhập
               </button>
             </div>

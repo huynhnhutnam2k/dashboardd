@@ -14,6 +14,15 @@ INCLUDE STYLES AND COMPONENTS
 .table-lg th {
   padding: 0.8rem 1rem;
 }
+
+/* .btn {
+  margin-left: auto !important;
+} */
+.login-btn{
+  /* margin-left:  !important;
+   */
+   margin: 0 auto !important;
+}
 tbody td {
   border-bottom: 0;
 }

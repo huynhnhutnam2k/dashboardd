@@ -33,13 +33,13 @@ const AddUserMain = () => {
       isAdmin: "",
     },
     validationSchema: yup.object({
-      email: yup.string().email().required("Required"),
+      email: yup.string().email().required("Vui lòng nhập email"),
       password: yup
         .string()
         .min(8, "Must be 8 character or more")
-        .required("Required"),
-      username: yup.string().required("Required"),
-      role: yup.string().default("User"),
+        .required("Vui lòng nhập password"),
+      username: yup.string().required("Vui lòng nhập tên tài khoản"),
+      role: yup.string().required("Vui lòng chọn chuyên khoa"),
       isAdmin: yup.string().default("false"),
     }),
     onSubmit: (values, { resetForm }) => {
@@ -92,6 +92,8 @@ const AddUserMain = () => {
                       // required
                       onChange={formik.handleChange}
                     ></input>
+                    {formik.errors.email && formik.touched.email && (
+                      <p style={{ color: "red" }}>*{formik.errors.email}</p>)}
                   </div>
                   <div className="mb-4">
                     <label className="form-label">Username</label>
@@ -103,7 +105,8 @@ const AddUserMain = () => {
                       name="username"
                       // required
                       onChange={formik.handleChange}
-                    ></input>
+                    ></input>{formik.errors.username && formik.touched.username && (
+                      <p style={{ color: "red" }}>*{formik.errors.username}</p>)}
                   </div>
                   <div className="mb-4">
                     <label className="form-label">Password</label>
@@ -113,9 +116,9 @@ const AddUserMain = () => {
                       rows="4"
                       value={formik.values.password}
                       name="password"
-                      required
                       onChange={formik.handleChange}
-                    ></input>
+                    ></input>{formik.errors.password && formik.touched.password && (
+                      <p style={{ color: "red" }}>*{formik.errors.password}</p>)}
                   </div>
                   <div className="mb-4">
                     <select
@@ -137,6 +140,8 @@ const AddUserMain = () => {
                         ))
                       )}
                     </select>
+                    {formik.errors.role && formik.touched.role && (
+                      <p style={{ color: "red" }}>*{formik.errors.role}</p>)}
                   </div>
                   <div className="mb-4">
                     <select
