@@ -65,7 +65,7 @@ const MainPre = () => {
     <>
       <section className="content-main">
         <div className="content-header">
-          <h2 className="content-title">Danh sách chẩn đoán</h2>
+          <h2 className="content-title">Danh sách chẩn đoán sơ bộ</h2>
           <div>
             <Link to="/add-pre" className="btn btn-primary">
               Thêm mới

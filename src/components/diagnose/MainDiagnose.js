@@ -68,7 +68,7 @@ const MainDiagnose = () => {
     <>
       <section className="content-main">
         <div className="content-header">
-          <h2 className="content-title">Danh sách chẩn đoán</h2>
+          <h2 className="content-title">Danh sách chẩn đoán xác định</h2>
           <div>
             <Link to="/add-diagnose" className="btn btn-primary">
               Thêm mới

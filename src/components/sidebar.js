@@ -63,7 +63,7 @@ const Sidebar = () => {
               >
                 {/* <i className="icon fas fa-shopping-bag"></i> */}
                 <i className="icon fal fa-question"></i>
-                <span className="text">Danh sách câu hỏi</span>
+                <span className="text">Danh sách tình huống</span>
               </NavLink>
             </li>
             <li className="menu-item">
