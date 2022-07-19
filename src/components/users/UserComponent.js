@@ -4,8 +4,6 @@ import Loading from "./../LoadingError/Loading";
 // import { getAllUser } from "../../redux/authSlice";
 import { useSelector, useDispatch } from 'react-redux'
 import { getAllUser, deleteUser } from "../../redux/authSlice";
-import { confirmAlert } from 'react-confirm-alert'; // Import
-import 'react-confirm-alert/src/react-confirm-alert.css';
 import './user.css'
 const UserComponent = () => {
   const { listUsers: users, userInfo, loading } = useSelector(state => state.auth)
@@ -20,27 +18,9 @@ const UserComponent = () => {
   // console.log(users, error)
   const delUser = async (e) => {
     const id = e.target.value
-    confirmAlert({
-      title: 'Xác nhận xóa',
-      message: 'Bạn có chắc muốn xóa người dùng này',
-      buttons: [
-        {
-          label: 'Có',
-          value: id,
-          onClick: () => deleteU(id)
-        },
-        {
-          label: 'Không'
-        }
-      ]
-    });
-  }
-  const deleteU = async (id) => {
-    console.log(id)
     await dispatch(deleteUser({ token, id }))
     window.location.reload();
   }
-
   return (
     <section className="content-main">
       <div className="content-header">
