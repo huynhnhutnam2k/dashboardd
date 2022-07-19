@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
 import Loading from "./../LoadingError/Loading";
 // import { getAllUser } from "../../redux/authSlice";
 import { useSelector, useDispatch } from 'react-redux'
