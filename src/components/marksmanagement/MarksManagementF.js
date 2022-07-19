@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { getAllMark } from "../../redux/markSlice";
 
-
+//dashkndasjdb
 const Styles = styled.div`
   padding: 1rem;
 
