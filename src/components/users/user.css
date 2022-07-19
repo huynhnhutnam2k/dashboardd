@@ -1,0 +1,28 @@
+.close {
+    position: absolute;
+    right: 14px;
+    top: 13px;
+    width: 32px;
+    height: 32px;
+    opacity: 0.3;
+    color: red;
+  }
+  .close:hover {
+    opacity: 1;
+  }
+  .close:before, .close:after {
+    position: absolute;
+    left: 12.9px;
+    content: ' ';
+    height: 40px;
+    bottom:-5.7px;
+    width: 2px;
+    background-color:red;
+  }
+  .close:before {
+    transform: rotate(45deg);
+  }
+  .close:after {
+    transform: rotate(-45deg);
+  }
+  

@@ -1,20 +1,46 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-
+import { useState } from "react";
 import Loading from "./../LoadingError/Loading";
 // import { getAllUser } from "../../redux/authSlice";
 import { useSelector, useDispatch } from 'react-redux'
-import { getAllUser } from "../../redux/authSlice";
+import { getAllUser, deleteUser } from "../../redux/authSlice";
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import './user.css'
 const UserComponent = () => {
-
   const { listUsers: users, userInfo, loading } = useSelector(state => state.auth)
   const dispatch = useDispatch()
   const token = userInfo?.token
+
+  console.log(userInfo)
   useEffect(() => {
     // getAllUser(dispatch, user?.token)
     dispatch(getAllUser(token))
   }, [dispatch, token])
   // console.log(users, error)
+  const delUser = async (e) => {
+    const id = e.target.value
+    confirmAlert({
+      title: 'Xác nhận xóa',
+      message: 'Bạn có chắc muốn xóa người dùng này',
+      buttons: [
+        {
+          label: 'Có',
+          value: id,
+          onClick: () => deleteU(id)
+        },
+        {
+          label: 'Không'
+        }
+      ]
+    });
+  }
+  const deleteU = async (id) => {
+    console.log(id)
+    await dispatch(deleteUser({ token, id }))
+    window.location.reload();
+  }
 
   return (
     <section className="content-main">
@@ -28,32 +54,6 @@ const UserComponent = () => {
       </div>
 
       <div className="card mb-4">
-        <header className="card-header">
-          <div className="row gx-3">
-            <div className="col-lg-4 col-md-6 me-auto">
-              <input
-                type="text"
-                placeholder="Tìm kiếm"
-                className="form-control"
-              />
-            </div>
-            <div className="col-lg-2 col-6 col-md-3">
-              <select className="form-select">
-                <option>Show 20</option>
-                <option>Show 30</option>
-                <option>Show 40</option>
-                <option>Show all</option>
-              </select>
-            </div>
-            <div className="col-lg-2 col-6 col-md-3">
-              <select className="form-select">
-                <option>Status: all</option>
-                <option>Active only</option>
-                <option>Disabled</option>
-              </select>
-            </div>
-          </div>
-        </header>
 
         {/* Card */}
 
@@ -62,11 +62,12 @@ const UserComponent = () => {
             <>
               <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4">
                 {/* List users */}
-                {users?.map(item => (
+                {users?.map(item => (<>
 
                   <div className="col" key={item._id}>
                     <div className="card card-user shadow-sm">
                       <div className="card-header">
+                        <button key={item._id} className="close" value={item._id} onClick={(e) => delUser(e)} />
                         <img
                           className="img-md img-avatar"
                           src="images/logo.gif"
@@ -83,7 +84,7 @@ const UserComponent = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div></>
                 ))}
               </div>
             </>
@@ -113,7 +114,7 @@ const UserComponent = () => {
           </nav>
         </div>
       </div>
-    </section>
+    </section >
   );
 };
 

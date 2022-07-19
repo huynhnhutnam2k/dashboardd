@@ -15,6 +15,7 @@ export const authSlice = createSlice({
     success: false,
     addUserSuccess: false,
     listUsers: [],
+    deleteSuccess: false,
     user: {},
     msg: "",
     situation: null,
@@ -131,6 +132,16 @@ export const authSlice = createSlice({
       .addCase(getByRole.rejected, (state) => {
         state.pending = false;
         state.error = true;
+      }).addCase(deleteUser.pending, (state) => {
+        state.pending = true;
+      })
+      .addCase(deleteUser.fulfilled, (state) => {
+        state.deleteSuccess = true;
+        state.pending = false;
+      })
+      .addCase(deleteUser.rejected, (state) => {
+        state.pending = false;
+        state.error = true;
       });
   },
 });
@@ -155,6 +166,25 @@ export const logIn = createAsyncThunk("auth/login", async ({ user }) => {
     console.log(error.response.data.message);
   }
 });
+
+
+export const deleteUser = createAsyncThunk(
+  "auth/deleteUser",
+  async ({ token, id }) => {
+    console.log(token, id)
+    try {
+      const res = await axios.post(`${URL_API}/user/deleteuser/${id}`, {
+        headers: {
+          token: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      return res?.data;
+    } catch (error) {
+      console.log(error.response.data);
+    }
+  }
+)
 export const addUser = createAsyncThunk(
   "auth/register",
   async ({ token, user }) => {
